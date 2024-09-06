@@ -1,24 +1,19 @@
 /**
- * Title of Project
- * Author Name
+ * Function Calls
+ * Nadia Abdul Aziz
  * 
- * HOW EMBARRASSING! I HAVE NO DESCRIPTION OF MY PROJECT!
- * PLEASE REMOVE A GRADE FROM MY WORK IF IT'S GRADED!
+ * Practice examples
  */
 
 "use strict";
 
-/**
- * OH LOOK I DIDN'T DESCRIBE SETUP!!
-*/
-function setup() {
 
+function setup() {
+    //Once at the beginning of the program
+    createCanvas(640, 480);
 }
 
-
-/**
- * OOPS I DIDN'T DESCRIBE WHAT MY DRAW DOES!
-*/
 function draw() {
-
+    //Once at the beginning of the program
+    background(255, 100, 100);
 }
