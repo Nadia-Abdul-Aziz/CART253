@@ -17,7 +17,7 @@ function setup() {
     //width x height in px
     //semicolon = command finished
     //tells computer command and brackets tells what to do for command
-    createCanvas(640, 480);
+    createCanvas(1000, 1000);
 }
 
 function draw() {
@@ -27,4 +27,9 @@ function draw() {
     //SHOULD HAVE LINE ON LEFT!!! CODE WILL NOT RUN IF NOT
     //Why background is every frame but canvas is not?
     background(100, 200, 200);
+    rect(400, 400, 200, 200)
+    rect(300, 300, 50, 50)
+    rect(650, 650, 50, 50)
+    rect(650, 300, 50, 50)
+    rect(300, 650, 50, 50)
 }
