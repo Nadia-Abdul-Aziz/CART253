@@ -73,6 +73,7 @@ function draw() {
  *      // = tells computer not to read, single line
  *      semicolon = command finished
  *      always put spaces after the comma
+ *      greyscale only needs one number in rgb
  * QUESTIONS?
  *      Why background is every frame but canvas is not?
  */
