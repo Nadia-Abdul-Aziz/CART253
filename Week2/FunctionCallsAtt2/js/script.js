@@ -21,7 +21,7 @@ function setup() {
  */
 function draw() {
     // Background color of the board (RGB, Black)
-    background(0, 0, 0);
+    background(0);
     // White Squares (Left point x, Left point y, W, H)
     rect(50, 50, 100, 100)
     rect(250, 50, 100, 100)
