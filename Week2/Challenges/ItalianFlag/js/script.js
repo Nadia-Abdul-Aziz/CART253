@@ -16,7 +16,7 @@ function setup() {
 
 
 /**
- * OOPS I DIDN'T DESCRIBE WHAT MY DRAW DOES!
+ * Draws background + rectangles for the italian flag + adds colors
 */
 function draw() {
     background(100, 150, 255);
@@ -29,5 +29,4 @@ function draw() {
     fill(255, 0, 0);
     noStroke();
     rect(500, 200, 200, 400);
-
 }
