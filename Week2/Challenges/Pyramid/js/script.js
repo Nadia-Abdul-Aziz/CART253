@@ -24,10 +24,10 @@ function draw() {
     fill(255, 255, 0);
     noStroke();
     ellipse(600, 900, 800, 800);
-
     ellipse(100, 700, 800, 800);
 
-    triangle(300, 300, 200,)
-
-
+    fill(100, 100, 50)
+    triangle(300, 300, 200, 600, 500, 700);
+    fill(50);
+    triangle(300, 300, 500, 700, 600, 450);
 }

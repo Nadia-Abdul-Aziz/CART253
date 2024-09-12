@@ -21,6 +21,7 @@ function setup() {
 function draw() {
     background(255, 0, 0);
 
+    Push
     fill(0, 0, 255);
     noStroke();
     ellipse(400, 400, 600, 600);
@@ -37,5 +38,6 @@ function draw() {
     line(400, 300, 400, 600);
 
     stroke(255, 255, 0);
+    noFill();
     arc(450, 600, 100, 200, 0, PI);
 }
