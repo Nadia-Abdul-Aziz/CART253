@@ -1,24 +1,30 @@
 /**
- * Title of Project
- * Author Name
+ * Chain
+ * Nadia Abdul Aziz
  * 
- * HOW EMBARRASSING! I HAVE NO DESCRIPTION OF MY PROJECT!
- * PLEASE REMOVE A GRADE FROM MY WORK IF IT'S GRADED!
+ * Attempt to draw chain from challenges
  */
 
 "use strict";
 
 /**
- * OH LOOK I DIDN'T DESCRIBE SETUP!!
+ * Draws canvas
 */
 function setup() {
-
+    createCanvas(800, 800);
 }
 
 
 /**
- * OOPS I DIDN'T DESCRIBE WHAT MY DRAW DOES!
+ * Draws ellipses of chain + borders
 */
 function draw() {
-
+    background(255, 255, 0);
+    fill(51, 0);
+    strokeWeight(40);
+    ellipse(400, 0, 200, 300);
+    ellipse(400, 200, 200, 300);
+    ellipse(400, 400, 200, 300);
+    ellipse(400, 600, 200, 300);
+    ellipse(400, 800, 200, 300);
 }
