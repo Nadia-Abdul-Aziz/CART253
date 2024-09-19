@@ -21,7 +21,7 @@ let backgroundColor = 'yellow'
 
 
 /**
- * OH LOOK I DIDN'T DESCRIBE SETUP!!
+ * canvas
 */
 function setup() {
     createCanvas(480, 480);
@@ -29,7 +29,7 @@ function setup() {
 
 
 /**
- * OOPS I DIDN'T DESCRIBE WHAT MY DRAW DOES!
+ * CHEEEEEEEEEEEEEEEEEEEESE
 */
 function draw() {
     background(backgroundColor);
