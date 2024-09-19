@@ -32,7 +32,7 @@ let bird = {
 
 
 /**
- * OH LOOK I DIDN'T DESCRIBE SETUP!!
+ * canvas
 */
 function setup() {
     createCanvas(640, 480)
@@ -40,7 +40,7 @@ function setup() {
 
 
 /**
- * OOPS I DIDN'T DESCRIBE WHAT MY DRAW DOES!
+ * borb flying
 */
 function draw() {
     background('black');
