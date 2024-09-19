@@ -7,6 +7,19 @@
 
 "use strict";
 
+//variables
+
+let cheeseHole = 100
+
+let cheeseX = 400
+
+let cheeseY = 100
+
+let fillColor = 'black'
+
+let backgroundColor = 'yellow'
+
+
 /**
  * OH LOOK I DIDN'T DESCRIBE SETUP!!
 */
@@ -19,10 +32,11 @@ function setup() {
  * OOPS I DIDN'T DESCRIBE WHAT MY DRAW DOES!
 */
 function draw() {
-    background(255, 255, 0);
+    background(backgroundColor);
 
     push();
     noStroke();
-    fill(255);
-    ellipse(400, 100, 100, 100)
+    fill(fillColor);
+    ellipse(cheeseX, cheeseY, cheeseHole);
+    pop();
 }
