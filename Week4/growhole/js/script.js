@@ -35,7 +35,7 @@ function draw() {
     background(225);
 
     growHole();
-    checkHoleSize();
+    //checkHoleSize();
     drawHole();
 }
 
@@ -44,20 +44,22 @@ function draw() {
  */
 function growHole() {
     hole.size += hole.growthRate;
+    //????
+    hole.size = constrain(hole.size, 0, hole.maxSize)
 }
 
 /**
  * Checks if the hole has reached its maximum size
  */
-function checkHoleSize() {
-    // We can *store* the condition we care about in a variable
-    const holeAtMaximum = (hole.size >= hole.maxSize);
-    // This makes the conditional even easier to read!
-    if (holeAtMaximum) {
-        // Stop the hole's growth! It's big enough!
-        hole.growthRate = 0;
-    }
-}
+//function checkHoleSize() {
+// We can *store* the condition we care about in a variable
+//const holeAtMaximum = (hole.size >= hole.maxSize);
+// This makes the conditional even easier to read!
+// if (holeAtMaximum) {
+// Stop the hole's growth! It's big enough!
+// hole.growthRate = 0;
+//}
+//}
 
 /**
  * Draws the hole on the canvas
