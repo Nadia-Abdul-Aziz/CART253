@@ -35,10 +35,12 @@ function draw() {
 
     // Move user circle
     moveUser();
+    movePuck();
 
     // Draw the user and puck
     drawUser();
     drawPuck();
+    // moveTarget();
 }
 
 /**
@@ -69,4 +71,29 @@ function drawPuck() {
     fill(puck.fill);
     ellipse(puck.x, puck.y, puck.size);
     pop();
+}
+
+function movePuck() {
+    const d = dist(user.x, user.y, puck.x, puck.y);
+    const overlap = (d < user.size / 2 + puck.size / 2);
+    if (overlap) {
+        const dx = user.x - puck.x;
+        const dy = user.y - puck.y;
+        if (abs(dx) < abs(dy)) {
+            if (dx < 0) {
+                puck.y += 5;
+            }
+            else if (dx > 0) {
+                puck.y -= 5;
+            }
+        }
+        else {
+            if (dy < 0) {
+                puck.x += 5;
+            }
+            else if (dy > 0) {
+                puck.x -= 5;
+            }
+        }
+    }
 }
