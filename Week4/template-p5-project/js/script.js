@@ -20,6 +20,18 @@ const user = {
     fill: "#000000"
 };
 
+const target = {
+    x: 200,
+    y: 200,
+    size: 50,
+    fill: "yellow",
+    fills: {
+        noOverlap: "black",
+        overlap: "white",
+    }
+
+}
+
 /**
  * Create the canvas
  */
@@ -37,6 +49,8 @@ function draw() {
     moveUser();
     movePuck();
 
+    checkTarget();
+
     // Draw the user and puck
     drawUser();
     drawPuck();
@@ -50,6 +64,8 @@ function moveUser() {
     user.x = mouseX;
     user.y = mouseY;
 }
+
+function
 
 /**
  * Displays the user circle
@@ -95,5 +111,16 @@ function movePuck() {
                 puck.x -= 5;
             }
         }
+    }
+}
+
+function checkTarget() {
+    const d = dist(puck.x, puck.y, target.x, target.y);
+    const overlap = (d < puck.size / 2 + target.size / 2);
+    if (overlap) {
+        target.fill = target.fills.overlap;
+    }
+    else {
+        target.fill = target.fills.noOverlap;
     }
 }
