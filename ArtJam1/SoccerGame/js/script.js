@@ -7,11 +7,12 @@
 
 "use strict";
 
-// Loading ball image
-// Consulted p5.js documentation: https://p5js.org/reference/p5/preload/
-function preload() {
-    img = loadImage('/assets/ball.png');
-}
+/** Loading ball image
+ *  Consulted p5.js documentation: https://p5js.org/reference/p5/preload/
+*/
+//function preload() {
+//img = loadImage('/assets/ball.png');
+//}
 
 /**
  * Creates Canvas & dictates rectangle mode
@@ -19,6 +20,7 @@ function preload() {
 function setup() {
     createCanvas(900, 650);
     rectMode(CENTER);
+    imageMode(CENTER);
 }
 
 /**
@@ -32,7 +34,21 @@ function draw() {
 }
 
 function drawBall() {
+    push();
+    noStroke();
+    let ball = {
+        ballXPosition: 450,
+        ballYPosition: 325,
+        ballSpeed: 1,
+        ballDirX: + 1,
+        ballDirY: 1,
+    }
 
+    //move in X direction
+    ball.ballXposition += (ball.ballDirX * ball.ballSpeed);
+
+    ellipse(ball.ballXPosition, ball.ballYPosition, 30);
+    pop();
 };
 
 function drawPaddle() {
@@ -45,6 +61,7 @@ function drawPaddle() {
     }
     paddle.x = constrain(paddle.x, 60, 840);
     rect(paddle.x, height - 20, paddle.sizeX, paddle.sizeY);
+    pop();
 }
 //////////ALL FUNCTIONS FOR THE BACKGROUND FIELD
 
