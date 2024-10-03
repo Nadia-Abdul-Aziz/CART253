@@ -32,7 +32,7 @@ let ball = {
     ballYPosition: 325,
     ballSpeed: 2,
     ballDirX: 3,
-    ballDirY: 1,
+    ballDirY: -1,
 };
 
 function draw() {
@@ -49,7 +49,10 @@ function draw() {
         ball.ballDirX = ball.ballDirX * -1 // Direction change but the other side of the field
     }
 
-    //Paddle collision with ball
+    if (ball.ballYPosition <= 20) {
+        ball.ballDirY = ball.ballDirY * -1 //direction change in Y
+    }
+    //Paddle collision with ball (Is this the right way to do this?????)
 };
 
 function drawBall() {
@@ -73,6 +76,8 @@ function drawPaddle() {
         sizeX: 100,
         sizeY: 20,
     }
+
+
     paddle.x = constrain(paddle.x, 60, 840);
     rect(paddle.x, height - 20, paddle.sizeX, paddle.sizeY);
     pop();

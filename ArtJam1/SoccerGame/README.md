@@ -13,6 +13,8 @@ This is a single player game in which the player must maneuver the paddle to sho
 This project uses [p5.js](https://p5js.org).
 
 Referred to course material (notes and videos) 
+Referred to tutorial to help figure out how to bounce off paddle: https://www.youtube.com/watch?v=rzC0JRr3QEM 
+
 
 ## Attribution
 
