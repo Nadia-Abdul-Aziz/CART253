@@ -45,3 +45,22 @@ function draw() {
     ellipse(ball.x, ball.y, ball.size);
     pop();
 }
+
+function mousePressed() {
+    ball.velocity.x = ball.speed;
+
+}
+
+function mouseReleased() {
+    ball.velocity.x = 0;
+}
+
+//resizes ball
+function mouseWheel(event) {
+    if (event.delta > 0) {
+        ball.size += 2;
+    }
+    else {
+        ball.size -= 2;
+    }
+}
