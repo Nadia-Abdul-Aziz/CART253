@@ -7,6 +7,12 @@
 
 "use strict";
 
+// Loading ball image
+// Consulted p5.js documentation: https://p5js.org/reference/p5/preload/
+function preload() {
+    img = loadImage('/assets/ball.png');
+}
+
 /**
  * Creates Canvas & dictates rectangle mode
 */
@@ -21,7 +27,13 @@ function setup() {
 function draw() {
     drawGrass();
     drawPaddle();
+    drawBall();
+
 }
+
+function drawBall() {
+
+};
 
 function drawPaddle() {
     push();
