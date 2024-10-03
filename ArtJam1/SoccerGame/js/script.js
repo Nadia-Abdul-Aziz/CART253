@@ -26,30 +26,44 @@ function setup() {
 /**
  * Creates the background visuals, paddle, goal and ball
 */
+
+let ball = {
+    ballXPosition: 450,
+    ballYPosition: 325,
+    ballSpeed: 2,
+    ballDirX: 3,
+    ballDirY: 1,
+};
+
 function draw() {
     drawGrass();
     drawPaddle();
     drawBall();
 
-}
+    //collision of ball with field edge
+    if (ball.ballXPosition >= width - 20) {
+        ball.ballDirX = ball.ballDirX * -1 //Direction changes in X
+    }
+
+    if (ball.ballXPosition <= 20) {
+        ball.ballDirX = ball.ballDirX * -1 // Direction change but the other side of the field
+    }
+
+    //Paddle collision with ball
+};
 
 function drawBall() {
     push();
     noStroke();
-    let ball = {
-        ballXPosition: 450,
-        ballYPosition: 325,
-        ballSpeed: 1,
-        ballDirX: + 1,
-        ballDirY: 1,
-    }
 
-    //move in X direction
-    ball.ballXposition += (ball.ballDirX * ball.ballSpeed);
+    // Move in X dir
+    ball.ballXPosition += (ball.ballDirX * ball.ballSpeed);
+    // Move in Y dir
+    ball.ballYPosition += (ball.ballDirY * ball.ballSpeed);
 
     ellipse(ball.ballXPosition, ball.ballYPosition, 30);
     pop();
-};
+}
 
 function drawPaddle() {
     push();
@@ -116,7 +130,6 @@ function drawGoalOutline() {
     const penaltySizeX = 200;
     const penaltySizeY = 200;
     arc(width / 2, penaltyPositionY, penaltySizeX, penaltySizeY, 0, PI);
-    pop();
 };
 
 
