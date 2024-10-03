@@ -73,13 +73,14 @@ function drawPaddle() {
     noStroke();
     let paddle = {
         x: mouseX,
+        y: height - 20,
         sizeX: 100,
         sizeY: 20,
     }
 
 
     paddle.x = constrain(paddle.x, 60, 840);
-    rect(paddle.x, height - 20, paddle.sizeX, paddle.sizeY);
+    rect(paddle.x, paddle.y, paddle.sizeX, paddle.sizeY);
     pop();
 }
 //////////ALL FUNCTIONS FOR THE BACKGROUND FIELD
