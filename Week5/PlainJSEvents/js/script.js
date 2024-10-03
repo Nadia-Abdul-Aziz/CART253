@@ -13,7 +13,8 @@ const bg = {
     fills: {
         black: "black",
         white: "white"
-    }
+    },
+    switchKey: 32
 }
 /**
  * create canvas
@@ -31,7 +32,14 @@ function setup() {
 function draw() {
     background(bg.fill);
 }
-
-function changeBg(){
-    
+//switches background from black to white
+function changeBg(event){
+    if (event.keyCode === bg.switchKey) {
+    if (bg.fill === bg.fills.black) {
+        bg.fill = bg.fills.white;
+    }
+    else {
+        bg.fill = bg.fills.black;
+    }
+}
 }
