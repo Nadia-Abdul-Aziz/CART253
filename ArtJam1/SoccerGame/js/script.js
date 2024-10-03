@@ -20,9 +20,20 @@ function setup() {
 */
 function draw() {
     drawGrass();
+    drawPaddle();
 }
 
-
+function drawPaddle() {
+    push();
+    noStroke();
+    let paddle = {
+        x: mouseX,
+        sizeX: 100,
+        sizeY: 20,
+    }
+    paddle.x = constrain(paddle.x, 60, 840);
+    rect(paddle.x, height - 20, paddle.sizeX, paddle.sizeY);
+}
 //////////ALL FUNCTIONS FOR THE BACKGROUND FIELD
 
 //Draws full field of grass
