@@ -1,4 +1,4 @@
-# SoccerGame
+# SOCCER-PONG
 
 Nadia Abdul Aziz
 
