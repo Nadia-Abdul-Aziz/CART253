@@ -1,17 +1,14 @@
 /**
- * SoccerGame
+ * SOCCER-PONG
  * Nadia Abdul Aziz
  * 
- * Tentative soccer type game
+ * One sided pong, except it's soccer
+ * Use the mouse to move the paddle and score a goal! Don't let the ball drop!
  */
 
 "use strict";
 
-/** Loading ball image
- *  Consulted p5.js documentation: https://p5js.org/reference/p5/preload/
-*/
-
-//variable for image to draw ball and net later
+//variables for images
 let soccerBall;
 
 let soccerNet;
@@ -20,13 +17,13 @@ let Goal;
 
 let gameOverTxt;
 
-//Loading ball
+//Loading images
 function preload() {
     soccerBall = loadImage('/assets/images/soccerBall.png');
     soccerNet = loadImage('/assets/images/soccerNet.png');
     Goal = loadImage('/assets/images/Goal.png');
     gameOverTxt = loadImage('/assets/images/gameOver.png');
-}
+};
 
 //Winning of game
 let gameWon = false;
@@ -56,7 +53,7 @@ let paddle = {
     sizeY: 20,
 };
 
-/** Creates Canvas & dictates rectangle mode, defining paddle.y */
+/** Creates Canvas & dictates modes, global definitions */
 
 function setup() {
     createCanvas(900, 650);
@@ -69,7 +66,7 @@ function setup() {
     //Defining ball direction values to randomly generate with every iteration
     ball.ballDirX = random(1, 4);
     ball.ballDirY = random(1, 4);
-}
+};
 
 
 /** Creates the background visuals, paddle, goal and ball */
@@ -86,12 +83,11 @@ function draw() {
 // Draws ball
 function drawBall() {
     push();
-
     // Move in X dir
     ball.ballXPosition += (ball.ballDirX * ball.ballSpeed);
     // Move in Y dir
     ball.ballYPosition += (ball.ballDirY * ball.ballSpeed);
-
+    //image of ball
     image(soccerBall, ball.ballXPosition, ball.ballYPosition, 50, 50);
     pop();
 };
@@ -105,7 +101,7 @@ function drawPaddle() {
     pop();
 };
 
-//////////ALL FUNCTIONS FOR THE BACKGROUND FIELD
+///////////FUNCTIONS TO DRAW FIELD
 
 //Draws full field of grass
 function drawGrass() {
@@ -113,7 +109,7 @@ function drawGrass() {
     drawLine();
 };
 
-//Draws background color, mapped to location of paddle
+//Draws background color, mapped to location of player paddle
 function drawBg() {
     push();
     colorMode(HSB);
@@ -126,7 +122,7 @@ function drawBg() {
     pop();
 };
 
-//Draws field lines
+//Draws all lines + goal
 function drawLine() {
 
     //general parameters
@@ -156,7 +152,7 @@ function drawMiddleArc() {
 };
 
 function drawGoalOutline() {
-    //Goal outline
+    //Goal outline, larger rectangle
     const rectPositionY = 85;
     const rectWidth = 400;
     const rectHeight = 150;
@@ -168,12 +164,15 @@ function drawGoalOutline() {
     const penaltySizeY = 200;
     arc(width / 2, penaltyPositionY, penaltySizeX, penaltySizeY, 0, PI);
 };
-//draw goal boundaries
+
+
 function drawGoal() {
+    //draw goal boundaries
+    //image of goal
     image(soccerNet, width / 2, goalPositionY, goalWidth, goalHeight);
 };
 
-////////// FUNCTION FOR COLLISIONS
+////////// FUNCTIONS FOR COLLISIONS
 
 function collisions() {
 
@@ -225,7 +224,7 @@ function showYouLost() {
     push();
     image(gameOverTxt, width / 2, height / 2);
     pop();
-}
+};
 
 // verify location of ball for winning game
 function checkGameWon() {
@@ -240,7 +239,7 @@ function checkGameWon() {
     }
 };
 
-
+//ending screen
 function showYouWon() {
     push();
     colorMode(HSB);
@@ -252,7 +251,6 @@ function showYouWon() {
     pop();
     //Game won icon, with mapping
     push();
-    textAlign(CENTER);
     let fillColor = {
         r: map(mouseX, 0, 255, 0, 255),
         g: map(mouseY, 0, 255, 0, 255),
