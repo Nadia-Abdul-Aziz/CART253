@@ -8,12 +8,14 @@ Nadia Abdul Aziz
 
 This is a single player game in which the player must maneuver the paddle to shoot a ball into the net in order to win. The only control needed is the mouse which controls the direction of the paddle. 
 
+Note to self: I really need to get over my fear of asking for help instead of spending hours trying to figure things out myself...
+
 ## Credits
 
 This project uses [p5.js](https://p5js.org).
 
 Referred to course material (notes and videos) 
-Referred to tutorial to help figure out how to bounce off paddle: https://www.youtube.com/watch?v=rzC0JRr3QEM 
+Referred to tutorial to help figure out how to bounce off paddle: https://www.youtube.com/watch?v=rzC0JRr3QEM (4:40 - 8:30)
 
 
 ## Attribution
