@@ -16,10 +16,16 @@ let soccerBall;
 
 let soccerNet;
 
+let Goal;
+
+let gameOverTxt;
+
 //Loading ball
 function preload() {
     soccerBall = loadImage('/assets/images/soccerBall.png');
     soccerNet = loadImage('/assets/images/soccerNet.png');
+    Goal = loadImage('/assets/images/Goal.png');
+    gameOverTxt = loadImage('/assets/images/gameOver.png');
 }
 
 //Winning of game
@@ -75,14 +81,11 @@ function draw() {
     collisions();
     checkGameOver();
     checkGameWon();
-
-
 };
 
 // Draws ball
 function drawBall() {
     push();
-    noStroke();
 
     // Move in X dir
     ball.ballXPosition += (ball.ballDirX * ball.ballSpeed);
@@ -113,7 +116,7 @@ function drawGrass() {
 //Draws background color, mapped to location of paddle
 function drawBg() {
     push();
-    colorMode(HSB)
+    colorMode(HSB);
     let bgColor = {
         h: 150,
         s: 100,
@@ -167,7 +170,7 @@ function drawGoalOutline() {
 };
 //draw goal boundaries
 function drawGoal() {
-    rect(width / 2, goalPositionY, goalWidth, goalHeight);
+    image(soccerNet, width / 2, goalPositionY, goalWidth, goalHeight);
 };
 
 ////////// FUNCTION FOR COLLISIONS
@@ -211,7 +214,7 @@ function checkGameOver() {
 function showYouLost() {
 
     push();
-    colorMode(HSB)
+    colorMode(HSB);
     //Values in hsb as constants
     const gameOverFill = color(150, 100, 50);
     fill(gameOverFill);
@@ -220,10 +223,7 @@ function showYouLost() {
     pop();
     //Text game over
     push();
-    textAlign(CENTER);
-    fill(255);
-    textSize(70);
-    text("GAME OVER", width / 2, height / 2);
+    image(gameOverTxt, width / 2, height / 2);
     pop();
 }
 
@@ -243,14 +243,14 @@ function checkGameWon() {
 
 function showYouWon() {
     push();
-    colorMode(HSB)
+    colorMode(HSB);
     //Values in hsb as constants
     const gameWonFill = color(150, 100, 50);
     fill(gameWonFill);
     //New background color
     rect(width / 2, height / 2, width, height);
     pop();
-    //Text game won
+    //Game won icon, with mapping
     push();
     textAlign(CENTER);
     let fillColor = {
@@ -259,9 +259,8 @@ function showYouWon() {
         b: map(mouseY, 0, 255, 0, 255),
     }
     fill(fillColor.r, fillColor.g, fillColor.b);
-    textSize(80);
-    textStyle(BOLD);
-    text("YOU WON!!", width / 2, height / 2);
+    rect(width / 2, height / 2, width / 2 + 40, height / 4);
+    image(Goal, width / 2, height / 2);
     pop();
 };
 

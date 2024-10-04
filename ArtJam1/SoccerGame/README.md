@@ -6,20 +6,21 @@ Nadia Abdul Aziz
 
 ## Description
 
-This is a single player game in which the player must maneuver the paddle to shoot a ball into the net in order to win. The only control needed is the mouse which controls the direction of the paddle. 
+This is a single player game in which the player must maneuver the paddle to shoot a soccer ball into the net to win. The speed of the ball is randomized and the mouse controls the paddle used to kick the ball. The player will lose the game if the ball falls below the bounds of the paddle. 
 
-Note to self: I really need to get over my fear of asking for help instead of spending hours trying to figure things out myself...
+Note to self: I really need to get over my fear of asking for help instead of spending hours trying to figure things out myself...I quickly realized that this was way above my pay grade...oh well...It's done now.
 
 ## Credits
 
-This project uses [p5.js](https://p5js.org).
+This project uses [p5.js](https://p5js.org) and multiple documentations and explanations were consulted.
 
-Referred to course material (notes and videos) 
-Referred to tutorial to help figure out how to bounce off paddle: https://www.youtube.com/watch?v=rzC0JRr3QEM (4:40 - 8:30)
+Referred to much of course material (notes, videos and discord) to build this project: https://pippinbarr.com/cart253/ 
+
+Referred to this tutorial from Youtube to help me figure out how to bounce off the paddle when I was stuck among other things: https://www.youtube.com/watch?v=rzC0JRr3QEM (4:40 - 8:30, other bits and pieces throughout the series)
 
 
 ## Attribution
 
-This bit should attribute any assets or other elements used taken from other sources. For example:
+SoccerBall image was sourced from FreeIconsPNG.com: https://www.freeiconspng.com/images/soccer-ball-png#google_vignette, copyright free
 
-The fish images were sourced from the [Creative Commons image "Georgia Aquarium Fish"](https://search.creativecommons.org/photos/96f6f770-eac1-488c-8abb-16bee7bcc874) by Mike Johnston which is licensed with CC BY 2.0. To view a copy of this license, visit https://creativecommons.org/licenses/by/2.0/.
+SoccerNet image was sourced from PNGTree.com: https://pngtree.com/so/soccer-net, copyright free
