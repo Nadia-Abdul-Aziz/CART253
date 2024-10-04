@@ -19,10 +19,10 @@ let gameOverTxt;
 
 //Loading images
 function preload() {
-    soccerBall = loadImage('/assets/images/soccerBall.png');
-    soccerNet = loadImage('/assets/images/soccerNet.png');
-    Goal = loadImage('/assets/images/Goal.png');
-    gameOverTxt = loadImage('/assets/images/gameOver.png');
+    soccerBall = loadImage('../assets/images/soccerBall.png');
+    soccerNet = loadImage('../assets/images/soccerNet.png');
+    Goal = loadImage('../assets/images/Goal.png');
+    gameOverTxt = loadImage('../assets/images/gameOver.png');
 };
 
 //Winning of game
