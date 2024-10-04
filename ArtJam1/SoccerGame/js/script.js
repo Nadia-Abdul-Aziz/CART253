@@ -11,18 +11,35 @@
  *  Consulted p5.js documentation: https://p5js.org/reference/p5/preload/
 */
 
+//variable for image to draw ball and net later
+let soccerBall;
+
+let soccerNet;
+
 //Loading ball
-//function preload() {
-//img = loadImage('/assets/ball.png');
-//}
+function preload() {
+    soccerBall = loadImage('/assets/images/soccerBall.png');
+    soccerNet = loadImage('/assets/images/soccerNet.png');
+}
+
+//Winning of game
+let gameWon = false;
+
+//End of game 
+let gameOver = false;
+
+//Goal Variables
+const goalPositionY = 60;
+const goalWidth = 200;
+const goalHeight = 100;
 
 // Soccer Ball Variables
 let ball = {
-    ballXPosition: 450,
-    ballYPosition: 325,
+    ballXPosition: 50,
+    ballYPosition: 20,
     ballSpeed: 4,
-    ballDirX: 1,
-    ballDirY: 2,
+    ballDirX: 0,
+    ballDirY: 0,
 };
 
 //Paddle Variables
@@ -31,7 +48,7 @@ let paddle = {
     y: undefined,
     sizeX: 100,
     sizeY: 20,
-}
+};
 
 /** Creates Canvas & dictates rectangle mode, defining paddle.y */
 
@@ -40,7 +57,12 @@ function setup() {
     rectMode(CENTER);
     imageMode(CENTER);
 
+    //Defining paddle location in y
     paddle.y = height - 20;
+
+    //Defining ball direction values to randomly generate with every iteration
+    ball.ballDirX = random(1, 4);
+    ball.ballDirY = random(1, 4);
 }
 
 
@@ -51,8 +73,13 @@ function draw() {
     drawPaddle();
     drawBall();
     collisions();
+    checkGameOver();
+    checkGameWon();
+
+
 };
 
+// Draws ball
 function drawBall() {
     push();
     noStroke();
@@ -62,17 +89,19 @@ function drawBall() {
     // Move in Y dir
     ball.ballYPosition += (ball.ballDirY * ball.ballSpeed);
 
-    ellipse(ball.ballXPosition, ball.ballYPosition, 30);
+    image(soccerBall, ball.ballXPosition, ball.ballYPosition, 50, 50);
     pop();
-}
+};
 
+// Draws paddle to kick ball
 function drawPaddle() {
     push();
     noStroke();
     paddle.x = constrain(mouseX, 60, 840);
     rect(paddle.x, paddle.y, paddle.sizeX, paddle.sizeY);
     pop();
-}
+};
+
 //////////ALL FUNCTIONS FOR THE BACKGROUND FIELD
 
 //Draws full field of grass
@@ -81,7 +110,7 @@ function drawGrass() {
     drawLine();
 };
 
-//Draws background
+//Draws background color, mapped to location of paddle
 function drawBg() {
     push();
     colorMode(HSB)
@@ -90,7 +119,6 @@ function drawBg() {
         s: 100,
         b: map(paddle.x, 60, 840, 50, 30),
     };
-
     background(bgColor.h, bgColor.s, bgColor.b);
     pop();
 };
@@ -98,6 +126,7 @@ function drawBg() {
 //Draws field lines
 function drawLine() {
 
+    //general parameters
     push();
     stroke(255, 255, 255);
     strokeWeight(5);
@@ -106,6 +135,7 @@ function drawLine() {
     drawMiddleArc();
     drawFrame();
     drawGoalOutline();
+    drawGoal();
 
     pop();
 };
@@ -135,6 +165,12 @@ function drawGoalOutline() {
     const penaltySizeY = 200;
     arc(width / 2, penaltyPositionY, penaltySizeX, penaltySizeY, 0, PI);
 };
+//draw goal boundaries
+function drawGoal() {
+    rect(width / 2, goalPositionY, goalWidth, goalHeight);
+};
+
+////////// FUNCTION FOR COLLISIONS
 
 function collisions() {
 
@@ -157,4 +193,75 @@ function collisions() {
     }
 };
 
+////////// ALL FUNCTIONS FOR GAME STATES
+
+//verify location of ball for game over
+function checkGameOver() {
+    //check for game over, if ball escapes paddle
+    if (ball.ballYPosition > height) {
+        gameOver = true;
+    }
+
+    if (gameOver) {
+        showYouLost();
+    }
+};
+
+// ending screen 
+function showYouLost() {
+
+    push();
+    colorMode(HSB)
+    //Values in hsb as constants
+    const gameOverFill = color(150, 100, 50);
+    fill(gameOverFill);
+    //New background color
+    rect(width / 2, height / 2, width, height);
+    pop();
+    //Text game over
+    push();
+    textAlign(CENTER);
+    fill(255);
+    textSize(70);
+    text("GAME OVER", width / 2, height / 2);
+    pop();
+}
+
+// verify location of ball for winning game
+function checkGameWon() {
+    //check for game won if the ball enters goal boundaries
+    if (ball.ballYPosition >= goalPositionY - goalHeight / 2 && ball.ballYPosition <= goalPositionY + goalHeight / 2 &&
+        ball.ballXPosition >= width / 2 - goalWidth / 2 && ball.ballXPosition <= width / 2 + goalWidth / 2) {
+        gameWon = true;
+    }
+
+    if (gameWon) {
+        showYouWon();
+    }
+};
+
+
+function showYouWon() {
+    push();
+    colorMode(HSB)
+    //Values in hsb as constants
+    const gameWonFill = color(150, 100, 50);
+    fill(gameWonFill);
+    //New background color
+    rect(width / 2, height / 2, width, height);
+    pop();
+    //Text game won
+    push();
+    textAlign(CENTER);
+    let fillColor = {
+        r: map(mouseX, 0, 255, 0, 255),
+        g: map(mouseY, 0, 255, 0, 255),
+        b: map(mouseY, 0, 255, 0, 255),
+    }
+    fill(fillColor.r, fillColor.g, fillColor.b);
+    textSize(80);
+    textStyle(BOLD);
+    text("YOU WON!!", width / 2, height / 2);
+    pop();
+};
 
