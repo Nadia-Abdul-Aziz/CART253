@@ -19,10 +19,10 @@ let gameOverTxt;
 
 //Loading images
 function preload() {
-    soccerBall = loadImage('../assets/images/soccerBall.png');
-    soccerNet = loadImage('../assets/images/soccerNet.png');
-    Goal = loadImage('../assets/images/Goal.png');
-    gameOverTxt = loadImage('../assets/images/gameOver.png');
+    soccerBall = loadImage('../CART253/ArtJam1/assets/images/soccerBall.png');
+    soccerNet = loadImage('../CART253/ArtJam1/assets/images/soccerNet.png');
+    Goal = loadImage('../CART253/ArtJam1/assets/images/Goal.png');
+    gameOverTxt = loadImage('../CART253/ArtJam1/assets/images/gameOver.png');
 };
 
 //Winning of game
