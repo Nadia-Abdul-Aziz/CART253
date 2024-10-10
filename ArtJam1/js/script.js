@@ -238,7 +238,6 @@ function checkGameWon() {
         showYouWon();
     }
 };
-
 //ending screen
 function showYouWon() {
     push();
