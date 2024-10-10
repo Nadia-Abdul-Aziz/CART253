@@ -74,13 +74,13 @@ function title() {
 
 function game() {
     background("#87ceeb");
-    moveFly();
     drawFly();
+    drawFrog();
+    drawScore();
+    moveFly();
     moveFrog();
     moveTongue();
-    drawFrog();
     checkTongueFlyOverlap();
-    drawScore();
 }
 
 /**
@@ -111,7 +111,7 @@ function drawScore() {
     push();
     textAlign(RIGHT, TOP);
     textSize(32);
-    text(score, width, -100, 100);
+    text(score, width, 100);
     pop();
 };
 
