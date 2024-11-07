@@ -15,111 +15,131 @@
 
 "use strict";
 
+let houstonImg;
+let webImg;
+
+function preload() {
+    houstonImg = loadImage('assets/images/homeIcon.png');
+    webImg = loadImage('assets/images/webShoot.png');
+}
+
 // Our frogs
-const player1 = {
+let player1 = {
     // The frog's body has a position and size
     body: {
         x: 320,
-        y: 490,
-        size: 150
-    },
-    // The frog's tongue has a position, size, speed, and state
-    tongue: {
-        x: undefined,
         y: 480,
-        size: 20,
+        size: 150,
+        speed: 10
+    },
+    web: {
+        x: 320,
+        y: 480,
+        size: 1,
+        tipSize: 100,
         speed: 20,
-        // Determines how the tongue moves each frame
-        state: "idle" // State can be: idle, outbound, inbound
+        state: "idle"
     }
 };
 
-const player2 = {
+let player2 = {
     // The frog's body has a position and size
     body: {
         x: 320,
         y: 0,
-        size: 150
+        size: 150,
+        speed: 10
     },
-    // The frog's tongue has a position, size, speed, and state
-    tongue: {
-        x: undefined,
-        y: 480,
-        size: 20,
+    web: {
+        x: 320,
+        y: 0,
+        size: 1,
+        tipSize: 100,
         speed: 20,
-        // Determines how the tongue moves each frame
-        state: "idle" // State can be: idle, outbound, inbound
+        state: "idle"
     }
 };
 
 let leftArrowPressed = false;
+
+// if (leftArrowPressed) {
+//     player1.body.x -= rotate(QUARTER_PI);
+// }
 
 /**
  * Creates the canvas and initializes the fly
  */
 function setup() {
     createCanvas(640, 480);
+    angleMode(DEGREES);
 }
 
 function draw() {
     background('black');
+    drawBorder();
+    // keyPressed();
+    // keyReleased();
     drawPlayer1();
     drawPlayer2();
 }
 
+function drawBorder() {
+    push();
+    noFill();
+    stroke(255); // Grey color
+    strokeWeight(5); // Border thickness
+    rect(0, 0, width, height);
+    pop();
+}
 
-/**
- * Moves the frog to the mouse position on x
- */
-
-/**
- * Displays the tongue (tip and line connection) and the frog (body)
- */
 function drawPlayer1() {
-    // Draw the tongue tip
     push();
-    fill("#ff0000");
-    noStroke();
-    ellipse(player1.tongue.x, player1.tongue.y, player1.tongue.size);
+    stroke("white");
+    strokeWeight(player1.web.size);
+    line(player1.web.x, player1.web.y, player1.body.x, player1.body.y);
     pop();
 
-    // Draw the rest of the tongue
-    push();
-    stroke("#ff0000");
-    strokeWeight(player1.tongue.size);
-    line(player1.tongue.x, player1.tongue.y, player1.body.x, player1.body.y);
-    pop();
+    imageMode(CENTER);
+    image(webImg, player1.web.x, player1.web.y, player1.web.tipSize, player1.web.tipSize);
 
-    // Draw the frog's body
     push();
-    fill("#00ff00");
-    noStroke();
-    ellipse(player1.body.x, player1.body.y, player1.body.size);
+    imageMode(CENTER);
+    translate(player1.body.x, player1.body.y);
+    rotate(180);
+    image(houstonImg, 0, 0, player1.body.size, player1.body.size);
     pop();
 }
 
 function drawPlayer2() {
-    // Draw the tongue tip
     push();
-    fill("#ff0000");
-    noStroke();
-    ellipse(player2.tongue.x, player2.tongue.y, player2.tongue.size);
+    stroke("white");
+    strokeWeight(player2.web.size);
+    line(player2.web.x, player2.web.y, player2.body.x, player2.body.y);
     pop();
 
-    // Draw the rest of the tongue
     push();
-    stroke("#ff0000");
-    strokeWeight(player2.tongue.size);
-    line(player2.tongue.x, player2.tongue.y, player2.body.x, player2.body.y);
+    imageMode(CENTER);
+    translate(player2.web.x, player2.web.y);
+    rotate(180);
+    image(webImg, 0, 0, player2.web.tipSize, player2.web.tipSize);
     pop();
 
-    // Draw the frog's body
     push();
-    fill("#00ff00");
-    noStroke();
-    ellipse(player2.body.x, player2.body.y, player2.body.size);
+    image(houstonImg, player2.body.x, player2.body.y, player2.body.size, player2.body.size);
     pop();
 }
+
+// function keyPressed() {
+//     if (keyCode === LEFT_ARROW) {
+//         leftArrowPressed = true;
+//     }
+// }
+
+// function keyReleased() {
+//     if (keyCode === LEFT_ARROW) {
+//         leftArrowPressed = false;
+//     }
+// }
 
 /**
  * Handles moving the tongue based on its state
@@ -153,21 +173,7 @@ function drawPlayer2() {
  * Displays the tongue (tip and line connection) and the frog (body)
  */
 
-if (leftArrowPressed) {
-    player1.body.x -= 5;
-}
 
-function keyPressed() {
-    if (keyCode === LEFT_ARROW) {
-        leftArrowPressed = true;
-    }
-}
-
-function keyReleased() {
-    if (keyCode === LEFT_ARROW) {
-        leftArrowPressed = false;
-    }
-}
 
 /**
  * Handles the tongue overlapping the fly
