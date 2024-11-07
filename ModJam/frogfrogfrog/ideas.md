@@ -8,7 +8,7 @@ Method to win: Grow to triple the size of opponent (Eating flies) & be able to r
 
 Players: 2 player (multiplayer)
 
-Aesthetic: TBD (Maybe not frogs & flies, who knows)
+Aesthetic: Spiders and bugs
 
 Mechanics:
 
