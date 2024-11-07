@@ -1,12 +1,12 @@
 /**
- * Frogfrogfrog
+ * player1
  * Pippin Barr
  * 
- * A game of catching flies with your frog-tongue
+ * A game of catching flies with your player1-web
  * 
  * Instructions:
- * - Move the frog with your mouse
- * - Click to launch the tongue
+ * - Move the player1 with your mouse
+ * - Click to launch the web
  * - Catch flies
  * 
  * Made with p5
@@ -15,40 +15,53 @@
 
 "use strict";
 
+//Defining variables for images
 let houstonImg;
 let webImg;
 
+//Loading assets
 function preload() {
     houstonImg = loadImage('assets/images/homeIcon.png');
     webImg = loadImage('assets/images/webShoot.png');
 }
 
-// Our frogs
+//Object for keyboard rotation
+let move = {
+    leftKeyActive: false,
+    rightKeyActive: false,
+    aKeyActive: false,
+    dKeyActive: false,
+}
+
+// Spiders
 let player1 = {
-    // The frog's body has a position and size
+    // Main body the player controls
     body: {
         x: 320,
         y: 480,
         size: 150,
-        speed: 10
+        speed: 10,
+        rotation: 0 //DEFAULT VALUE!!!!
     },
+    //Thing the spider shoots to catch bugs
     web: {
         x: 320,
         y: 480,
         size: 1,
-        tipSize: 100,
+        tipSize: 100, //Different size for the tip to increase surface area
         speed: 20,
-        state: "idle"
+        state: "idle" //DEFAULT VALUE!!!
     }
 };
 
+//Same as player1
 let player2 = {
-    // The frog's body has a position and size
     body: {
         x: 320,
         y: 0,
         size: 150,
-        speed: 10
+        speed: 10,
+        rotation: 0
     },
     web: {
         x: 320,
@@ -59,12 +72,6 @@ let player2 = {
         state: "idle"
     }
 };
-
-let leftArrowPressed = false;
-
-// if (leftArrowPressed) {
-//     player1.body.x -= rotate(QUARTER_PI);
-// }
 
 /**
  * Creates the canvas and initializes the fly
@@ -77,8 +84,8 @@ function setup() {
 function draw() {
     background('black');
     drawBorder();
-    // keyPressed();
-    // keyReleased();
+    moveSpider();
+    moveweb()
     drawPlayer1();
     drawPlayer2();
 }
@@ -90,6 +97,71 @@ function drawBorder() {
     strokeWeight(5); // Border thickness
     rect(0, 0, width, height);
     pop();
+}
+
+function keyPressed() {
+    //Left and right
+    if (keyCode === LEFT_ARROW) {
+        move.leftKeyActive = true;
+    }
+    else if (keyCode === RIGHT_ARROW) {
+        move.rightKeyActive = true;
+    }
+    //WASD, separate from previous statement because can be triggered together, alternatively could have been a switch statement
+    if (keyCode === 68) {  // D key
+        move.aKeyActive = true;
+    }
+    else if (keyCode === 65) {  // A key
+        move.dKeyActive = true;
+    }
+    //Web of player 1 move
+    if (keyCode === UP_ARROW) {
+        // Only move the web if it is currently idle
+        if (player1.web.state === "idle") {
+            player1.web.state = "outbound";
+        }
+    }
+
+    if (keyCode === 83) {
+        // Only move the web if it is currently idle
+        if (player2.web.state === "idle") {
+            player2.web.state = "outbound";
+        }
+    }
+
+}
+
+function keyReleased() {
+    if (keyCode === LEFT_ARROW) {
+        move.leftKeyActive = false;
+    }
+    else if (keyCode === RIGHT_ARROW) {
+        move.rightKeyActive = false;
+    }
+
+    if (keyCode === 68) {  // D key
+        move.aKeyActive = false;
+    }
+    else if (keyCode === 65) {  // A key
+        move.dKeyActive = false;
+    }
+}
+
+//Spider rotates by 1 pixel when the arrows are pressed, constrained to a maximum of 30 pixels on either side
+function moveSpider() {
+    if (move.leftKeyActive) {
+        player1.body.rotation = constrain(player1.body.rotation - 1, -30, 30);
+    }
+    if (move.rightKeyActive) {
+        player1.body.rotation = constrain(player1.body.rotation + 1, -30, 30);
+    }
+
+    if (move.aKeyActive) {
+        player2.body.rotation = constrain(player2.body.rotation - 1, -30, 30);
+    }
+    if (move.dKeyActive) {
+        player2.body.rotation = constrain(player2.body.rotation + 1, -30, 30);
+    }
 }
 
 function drawPlayer1() {
@@ -106,6 +178,7 @@ function drawPlayer1() {
     imageMode(CENTER);
     translate(player1.body.x, player1.body.y);
     rotate(180);
+    rotate(player1.body.rotation);
     image(houstonImg, 0, 0, player1.body.size, player1.body.size);
     pop();
 }
@@ -125,77 +198,132 @@ function drawPlayer2() {
     pop();
 
     push();
-    image(houstonImg, player2.body.x, player2.body.y, player2.body.size, player2.body.size);
+    imageMode(CENTER);
+    translate(player2.body.x, player2.body.y);
+    rotate(player2.body.rotation);  // Apply the rotation
+    image(houstonImg, 0, 0, player2.body.size, player2.body.size);
     pop();
 }
 
-// function keyPressed() {
-//     if (keyCode === LEFT_ARROW) {
-//         leftArrowPressed = true;
-//     }
-// }
 
-// function keyReleased() {
-//     if (keyCode === LEFT_ARROW) {
-//         leftArrowPressed = false;
-//     }
-// }
+
 
 /**
- * Handles moving the tongue based on its state
+ * Handles moving the web based on its state
  */
-// function moveTongue() {
-//     // Tongue matches the frog's x
-//     frog.tongue.x = frog.body.x;
-//     // If the tongue is idle, it doesn't do anything
-//     if (frog.tongue.state === "idle") {
+// function moveweb() {
+//     // web matches the player1's x
+//     player1.web.x = player1.body.x;
+//     // If the web is idle, it doesn't do anything
+//     if (player1.web.state === "idle") {
 //         // Do nothing
 //     }
-//     // If the tongue is outbound, it moves up
-//     else if (frog.tongue.state === "outbound") {
-//         frog.tongue.y += -frog.tongue.speed;
-//         // The tongue bounces back if it hits the top
-//         if (frog.tongue.y <= 0) {
-//             frog.tongue.state = "inbound";
+
+//     // If the web is outbound, it moves up
+//     else if (player1.web.state === "outbound") {
+//         player1.web.y += -player1.web.speed;
+//         // The web bounces back if it hits the top
+//         if (player1.web.y <= 0) {
+//             player1.web.state = "inbound";
 //         }
 //     }
-//     // If the tongue is inbound, it moves down
-//     else if (frog.tongue.state === "inbound") {
-//         frog.tongue.y += frog.tongue.speed;
-//         // The tongue stops if it hits the bottom
-//         if (frog.tongue.y >= height) {
-//             frog.tongue.state = "idle";
+//     // If the web is inbound, it moves down
+//     else if (player1.web.state === "inbound") {
+//         player1.web.y += player1.web.speed;
+//         // The web stops if it hits the bottom
+//         if (player1.web.y >= height) {
+//             player1.web.state = "idle";
+//         }
+//     }
+
+//     //player 2
+
+//     // web matches the player1's x
+//     player2.web.x = player2.body.x;
+//     // If the web is idle, it doesn't do anything
+//     if (player2.web.state === "idle") {
+//         // Do nothing
+//     }
+
+//     // If the web is outbound, it moves up
+//     else if (player2.web.state === "outbound") {
+//         player2.web.y += -player2.web.speed;
+//         // The web bounces back if it hits the top
+//         if (player2.web.y <= 0) {
+//             player2.web.state = "inbound";
+//         }
+//     }
+//     // If the web is inbound, it moves down
+//     else if (player2.web.state === "inbound") {
+//         player2.web.y += player2.web.speed;
+//         // The web stops if it hits the bottom
+//         if (player2.web.y >= height) {
+//             player2.web.state = "idle";
 //         }
 //     }
 // }
 
+function moveweb() {
+    // Player 1 
+    if (player1.web.state === "idle") {
+        player1.web.x = player1.body.x;
+        player1.web.y = player1.body.y;
+    }
+    else if (player1.web.state === "outbound") {
+        player1.web.x = player1.body.x;
+        player1.web.y += -player1.web.speed;
+        if (player1.web.y <= 0) {
+            player1.web.state = "inbound";
+        }
+    }
+    else if (player1.web.state === "inbound") {
+        player1.web.x = player1.body.x;
+        player1.web.y += player1.web.speed;
+        if (player1.web.y >= player1.body.y) {
+            player1.web.state = "idle";
+            player1.web.y = player1.body.y;
+        }
+    }
+
+    // Player 2
+    if (player2.web.state === "idle") {
+        player2.web.x = player2.body.x;
+        player2.web.y = player2.body.y;
+    }
+    else if (player2.web.state === "outbound") {
+        player2.web.x = player2.body.x;
+        player2.web.y += player2.web.speed; 
+        if (player2.web.y >= height) {
+            player2.web.state = "inbound";
+        }
+    }
+    else if (player2.web.state === "inbound") {
+        player2.web.x = player2.body.x;
+        player2.web.y += -player2.web.speed; 
+        if (player2.web.y <= player2.body.y) {
+            player2.web.state = "idle";
+            player2.web.y = player2.body.y;
+        }
+    }
+}
+
+
 /**
- * Displays the tongue (tip and line connection) and the frog (body)
+ * Handles the web overlapping the fly
  */
-
-
-
-/**
- * Handles the tongue overlapping the fly
- */
-// function checkTongueFlyOverlap() {
-//     // Get distance from tongue to fly
-//     const d = dist(frog.tongue.x, frog.tongue.y, fly.x, fly.y);
+// function checkwebFlyOverlap() {
+//     // Get distance from web to fly
+//     const d = dist(player1.web.x, player1.web.y, fly.x, fly.y);
 //     // Check if it's an overlap
-//     const eaten = (d < frog.tongue.size / 2 + fly.size / 2);
+//     const eaten = (d < player1.web.size / 2 + fly.size / 2);
 //     if (eaten) {
 //         // Reset the fly
 //         resetFly();
-//         // Bring back the tongue
-//         frog.tongue.state = "inbound";
+//         // Bring back the web
+//         player1.web.state = "inbound";
 //     }
 // }
 
 /**
- * Launch the tongue on click (if it's not launched yet)
+ * Launch the web on click (if it's not launched yet)
  */
-// function keyPressed() {
-//     if (frog.tongue.state === "idle") {
-//         frog.tongue.state = "outbound";
-//     }
-// }
