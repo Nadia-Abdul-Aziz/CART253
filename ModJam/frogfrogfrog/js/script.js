@@ -27,14 +27,23 @@ function preload() {
     bugImg = loadImage('assets/images/bug.png');
 }
 
-// Bugs
-const bug = {
-    x: 0,
-    y: 200,
-    size: 50,
-    speed: 1,
-    yRange: 100,
-};
+//Array for bug spawning 
+let bugs = [];
+
+//Timer variables
+let lastSpawnTime = 0;
+const spawnInterval = 3000;
+
+// // Bugs
+// const bug = {
+//     x: 0,
+//     y: 240,
+//     size: 50,
+//     speed: 5,
+//     yRange: 100,
+//     moveAngle: 0, //Plz why did I do this to myself and decide to use angles everywhere in this project??? 
+//     changeDirectionChance: 0.05 //Likelihood the bug switches directions and heads the other way, currently 5%
+// };
 
 //Object for keyboard rotation
 let move = {
@@ -92,6 +101,9 @@ let player2 = {
 function setup() {
     createCanvas(640, 480);
     angleMode(DEGREES);
+
+    //make first bug
+    spawnNewBug();
 }
 
 function draw() {
@@ -284,11 +296,73 @@ function moveweb() {
     }
 }
 
+function spawnNewBug() {
+    bugs.push({
+        x: 0,
+        y: random(height),
+        size: 50,
+        speed: 5,
+        yRange: 100,
+        moveAngle: random(-45, 45),
+        changeDirectionChance: 0.05
+    });
+}
+
+function spawnBugAgain() {
+
+    if (millis() - lastSpawnTime > spawnInterval) {
+        spawnNewBug();
+        lastSpawnTime = millis();
+    }
+
+    // Update and draw all bugs
+    for (let bug of bugs) {
+        moveBug(bug);
+        drawBug(bug);
+    }
+    
+}
+
+
 function moveBug() {
-    bug.x += bug.speed;
-    const startY = height / 2;
-    bug.y += random(-10, 10);
-    bug.y = constrain(bug.y, startY - bug.yRange, startY + bug.yRange);
+
+    if (random() < bug.changeDirectionChance) {
+        // Add a random angle change between -60 and 60 degrees to create more natural movement
+        bug.moveAngle += random(-60, 60);
+    }
+
+    // Move bug based on current angle
+    bug.x += cos(bug.moveAngle) * bug.speed;
+    bug.y += sin(bug.moveAngle) * bug.speed;
+
+    // Check wall collisions and change direction immediately
+    let hitWall = false;
+
+    // Left wall
+    if (bug.x < 0) {
+        bug.x = 0;
+        bug.moveAngle = -bug.moveAngle + 180;
+        hitWall = true;
+    }
+    // Right wall
+    else if (bug.x > width - bug.size) {
+        bug.x = width - bug.size;
+        bug.moveAngle = -bug.moveAngle + 180;
+        hitWall = true;
+    }
+
+    // Top wall
+    if (bug.y < 0) {
+        bug.y = 0;
+        bug.moveAngle = -bug.moveAngle;
+        hitWall = true;
+    }
+    // Bottom wall
+    else if (bug.y > height - bug.size) {
+        bug.y = height - bug.size;
+        bug.moveAngle = -bug.moveAngle;
+        hitWall = true;
+    }
 }
 
 function drawBug() {
@@ -314,7 +388,10 @@ function checkWebBugOverlap() {
 }
 
 function resetBug() {
+    // bug.x = 0;
+    // bug.y = random(bug.yRange, height - bug.yRange);
+    // bug.speed += 0.5;
     bug.x = 0;
-    bug.y = random(bug.yRange, height - bug.yRange);
-    bug.speed += 0.5;
+    bug.y = random(height);
+    bug.moveAngle = random(-45, 45); // Start moving generally rightward
 }
