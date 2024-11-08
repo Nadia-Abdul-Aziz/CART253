@@ -46,13 +46,12 @@ Mechanics:
     - 1 fly = growth of 1?
     - remember to constrain
 
-- Fly mechanics
+- Fly mechanics (DONE)
     - Random fly movement in y and x?
-    - Random spawn along 360 edges
      - time based spawn
         - fly generates every 3 seconds?
     - don't dissapear until eaten by player 1/2, keeps flying around, CAN have multiple flies at once
-    - limit of 3
+    - limit of 3 ??? CHANGED TO NO LIMIT
     - noise()
 
 - Requirements to eat opponent

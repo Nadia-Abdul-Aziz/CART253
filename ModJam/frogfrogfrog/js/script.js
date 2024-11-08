@@ -68,7 +68,8 @@ let player1 = {
         y: 480,
         size: 150,
         speed: 10,
-        rotation: 0 //DEFAULT VALUE!!!!
+        rotation: 0, //DEFAULT VALUE!!!!
+        growthAmount: 0 //DEFAULT VALUE!!!!
     },
     //Thing the spider shoots to catch bugs
     web: {
@@ -89,7 +90,8 @@ let player2 = {
         y: 0,
         size: 150,
         speed: 10,
-        rotation: 0
+        rotation: 0,
+        growthAmount: 0
     },
     web: {
         x: 320,
@@ -123,28 +125,11 @@ function draw() {
     checkAllWebBugOverlaps();
 }
 
-function newSpawn() {
-    if (millis() - lastSpawnTime >= spawnInterval) {
-        const newSpeed = random(5, 8);
-        const newDirectionChance = random(0.05, 0.1);
-        bugs.push(createBug(newSpeed, newDirectionChance));
-        lastSpawnTime = millis();
-    }
-}
-
-function drawBug() {
-
-    for (let bug of bugs) {
-        moveSingleBug(bug);
-        drawSingleBug(bug);
-    }
-}
-
 function drawBorder() {
     push();
     noFill();
-    stroke(255); 
-    strokeWeight(5); 
+    stroke(255);
+    strokeWeight(5);
     rect(0, 0, width, height);
     pop();
 }
@@ -231,7 +216,7 @@ function drawPlayer1() {
     translate(player1.body.x, player1.body.y);
     rotate(180);
     rotate(player1.body.rotation);
-    image(houstonImg, 0, 0, player1.body.size, player1.body.size);
+    image(houstonImg, 0, 0, player1.body.size + player1.body.growthAmount, player1.body.size + player1.body.growthAmount);
     pop();
 }
 
@@ -253,7 +238,7 @@ function drawPlayer2() {
     imageMode(CENTER);
     translate(player2.body.x, player2.body.y);
     rotate(player2.body.rotation);  // Apply the rotation
-    image(houstonImg, 0, 0, player2.body.size, player2.body.size);
+    image(houstonImg, 0, 0, player2.body.size + player2.body.growthAmount, player2.body.size + player2.body.growthAmount);
     pop();
 }
 
@@ -318,77 +303,22 @@ function moveweb() {
     }
 }
 
-// function moveBug() {
+function newSpawn() {
+    if (millis() - lastSpawnTime >= spawnInterval) {
+        const newSpeed = random(5, 8);
+        const newDirectionChance = random(0.05, 0.1);
+        bugs.push(createBug(newSpeed, newDirectionChance));
+        lastSpawnTime = millis();
+    }
+}
 
-//     if (random() < bug.changeDirectionChance) {
-//         // Add a random angle change between -60 and 60 degrees to create more natural movement
-//         bug.moveAngle += random(-60, 60);
-//     }
+function drawBug() {
 
-//     // Move bug based on current angle
-//     bug.x += cos(bug.moveAngle) * bug.speed;
-//     bug.y += sin(bug.moveAngle) * bug.speed;
-
-//     // Check wall collisions and change direction immediately
-//     let hitWall = false;
-
-//     // Left wall
-//     if (bug.x < 0) {
-//         bug.x = 0;
-//         bug.moveAngle = -bug.moveAngle + 180;
-//         hitWall = true;
-//     }
-//     // Right wall
-//     else if (bug.x > width - bug.size) {
-//         bug.x = width - bug.size;
-//         bug.moveAngle = -bug.moveAngle + 180;
-//         hitWall = true;
-//     }
-
-//     // Top wall
-//     if (bug.y < 0) {
-//         bug.y = 0;
-//         bug.moveAngle = -bug.moveAngle;
-//         hitWall = true;
-//     }
-//     // Bottom wall
-//     else if (bug.y > height - bug.size) {
-//         bug.y = height - bug.size;
-//         bug.moveAngle = -bug.moveAngle;
-//         hitWall = true;
-//     }
-// }
-
-// function drawBug() {
-//     image(bugImg, bug.x, bug.y, bug.size, bug.size);
-// }
-
-// function checkWebBugOverlap() {
-//     // Check overlap for player 1
-//     const d1 = dist(player1.web.x, player1.web.y, bug.x, bug.y);
-//     const caught1 = (d1 < player1.web.size / 2 + bug.size / 2);
-//     if (caught1) {
-//         resetBug();
-//         player1.web.state = "inbound";
-//     }
-
-//     // Check overlap for player 2
-//     const d2 = dist(player2.web.x, player2.web.y, bug.x, bug.y);
-//     const caught2 = (d2 < player2.web.size / 2 + bug.size / 2);
-//     if (caught2) {
-//         resetBug();
-//         player2.web.state = "inbound";
-//     }
-// }
-
-// function resetBug() {
-//     // bug.x = 0;
-//     // bug.y = random(bug.yRange, height - bug.yRange);
-//     // bug.speed += 0.5;
-//     bug.x = 0;
-//     bug.y = random(height);
-//     bug.moveAngle = random(-45, 45); // Start moving generally rightward
-// }
+    for (let bug of bugs) {
+        moveSingleBug(bug);
+        drawSingleBug(bug);
+    }
+}
 
 function moveSingleBug(bug) {
     if (random() < bug.changeDirectionChance) {
@@ -436,8 +366,10 @@ function checkAllWebBugOverlaps() {
 
             if (caught1) {
                 player1.web.state = "inbound";
+                player1.body.growthAmount += 10;
             } else {
                 player2.web.state = "inbound";
+                player2.body.growthAmount += 10;
             }
         }
     }
