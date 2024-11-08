@@ -209,64 +209,6 @@ function drawPlayer2() {
     pop();
 }
 
-
-
-
-/**
- * Handles moving the web based on its state
- */
-// function moveweb() {
-//     // web matches the player1's x
-//     player1.web.x = player1.body.x;
-//     // If the web is idle, it doesn't do anything
-//     if (player1.web.state === "idle") {
-//         // Do nothing
-//     }
-
-//     // If the web is outbound, it moves up
-//     else if (player1.web.state === "outbound") {
-//         player1.web.y += -player1.web.speed;
-//         // The web bounces back if it hits the top
-//         if (player1.web.y <= 0) {
-//             player1.web.state = "inbound";
-//         }
-//     }
-//     // If the web is inbound, it moves down
-//     else if (player1.web.state === "inbound") {
-//         player1.web.y += player1.web.speed;
-//         // The web stops if it hits the bottom
-//         if (player1.web.y >= height) {
-//             player1.web.state = "idle";
-//         }
-//     }
-
-//     //player 2
-
-//     // web matches the player1's x
-//     player2.web.x = player2.body.x;
-//     // If the web is idle, it doesn't do anything
-//     if (player2.web.state === "idle") {
-//         // Do nothing
-//     }
-
-//     // If the web is outbound, it moves up
-//     else if (player2.web.state === "outbound") {
-//         player2.web.y += -player2.web.speed;
-//         // The web bounces back if it hits the top
-//         if (player2.web.y <= 0) {
-//             player2.web.state = "inbound";
-//         }
-//     }
-//     // If the web is inbound, it moves down
-//     else if (player2.web.state === "inbound") {
-//         player2.web.y += player2.web.speed;
-//         // The web stops if it hits the bottom
-//         if (player2.web.y >= height) {
-//             player2.web.state = "idle";
-//         }
-//     }
-// }
-
 function moveweb() {
     // Player 1 
     if (player1.web.state === "idle") {
