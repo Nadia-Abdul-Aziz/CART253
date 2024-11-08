@@ -48,9 +48,10 @@ let player1 = {
         x: 320,
         y: 480,
         size: 1,
-        tipSize: 100, //Different size for the tip to increase surface area
+        tipSize: 75, //Different size for the tip to increase surface area
         speed: 20,
-        state: "idle" //DEFAULT VALUE!!!
+        state: "idle", //DEFAULT VALUE!!!
+        distance: 0 //distance from origin spider NEEDED FOR THE TRIG CALCULATIONS!!!
     }
 };
 
@@ -67,9 +68,10 @@ let player2 = {
         x: 320,
         y: 0,
         size: 1,
-        tipSize: 100,
+        tipSize: 75,
         speed: 20,
-        state: "idle"
+        state: "idle",
+        distance: 0
     }
 };
 
@@ -119,6 +121,7 @@ function keyPressed() {
         // Only move the web if it is currently idle
         if (player1.web.state === "idle") {
             player1.web.state = "outbound";
+            player1.web.distance = 0;
         }
     }
 
@@ -126,6 +129,7 @@ function keyPressed() {
         // Only move the web if it is currently idle
         if (player2.web.state === "idle") {
             player2.web.state = "outbound";
+            player2.web.distance = 0;
         }
     }
 
@@ -150,17 +154,17 @@ function keyReleased() {
 //Spider rotates by 1 pixel when the arrows are pressed, constrained to a maximum of 30 pixels on either side
 function moveSpider() {
     if (move.leftKeyActive) {
-        player1.body.rotation = constrain(player1.body.rotation - 1, -30, 30);
+        player1.body.rotation = constrain(player1.body.rotation - 1, -40, 40);
     }
     if (move.rightKeyActive) {
-        player1.body.rotation = constrain(player1.body.rotation + 1, -30, 30);
+        player1.body.rotation = constrain(player1.body.rotation + 1, -40, 40);
     }
 
     if (move.aKeyActive) {
-        player2.body.rotation = constrain(player2.body.rotation - 1, -30, 30);
+        player2.body.rotation = constrain(player2.body.rotation - 1, -40, 40);
     }
     if (move.dKeyActive) {
-        player2.body.rotation = constrain(player2.body.rotation + 1, -30, 30);
+        player2.body.rotation = constrain(player2.body.rotation + 1, -40, 40);
     }
 }
 
@@ -268,19 +272,28 @@ function moveweb() {
     if (player1.web.state === "idle") {
         player1.web.x = player1.body.x;
         player1.web.y = player1.body.y;
+        player1.web.distance = 0; //default distance is zero
     }
     else if (player1.web.state === "outbound") {
-        player1.web.x = player1.body.x;
-        player1.web.y += -player1.web.speed;
-        if (player1.web.y <= 0) {
+        player1.web.distance += player1.web.speed; //calculate position based on angle and distance
+        let angle = -player1.body.rotation - 180; //using reversed angle
+        player1.web.x = player1.body.x + player1.web.distance * sin(angle);
+        player1.web.y = player1.body.y + player1.web.distance * cos(angle)
+
+        //border collision adjusted to include hits to any border, with the exception of the same side the spider is on
+        if (player1.web.y <= 0 || player1.web.x <= 0 || player1.web.x >= width) {
             player1.web.state = "inbound";
         }
     }
     else if (player1.web.state === "inbound") {
-        player1.web.x = player1.body.x;
-        player1.web.y += player1.web.speed;
-        if (player1.web.y >= player1.body.y) {
+        player1.web.distance -= player1.web.speed;
+        let angle = -player1.body.rotation - 180;
+        player1.web.x = player1.body.x + player1.web.distance * sin(angle);
+        player1.web.y = player1.body.y + player1.web.distance * cos(angle);
+
+        if (player1.web.distance <= 0) {
             player1.web.state = "idle";
+            player1.web.x = player1.body.x;
             player1.web.y = player1.body.y;
         }
     }
@@ -289,24 +302,31 @@ function moveweb() {
     if (player2.web.state === "idle") {
         player2.web.x = player2.body.x;
         player2.web.y = player2.body.y;
+        player2.web.distance = 0;
     }
     else if (player2.web.state === "outbound") {
-        player2.web.x = player2.body.x;
-        player2.web.y += player2.web.speed; 
-        if (player2.web.y >= height) {
+        player2.web.distance += player2.web.speed;
+        let angle = -player2.body.rotation;
+        player2.web.x = player2.body.x + player2.web.distance * sin(angle);
+        player2.web.y = player2.body.y + player2.web.distance * cos(angle);
+
+        if (player2.web.y >= height || player2.web.x <= 0 || player2.web.x >= width) {
             player2.web.state = "inbound";
         }
     }
     else if (player2.web.state === "inbound") {
-        player2.web.x = player2.body.x;
-        player2.web.y += -player2.web.speed; 
-        if (player2.web.y <= player2.body.y) {
+        player2.web.distance -= player2.web.speed;
+        let angle = -player2.body.rotation;
+        player2.web.x = player2.body.x + player2.web.distance * sin(angle);
+        player2.web.y = player2.body.y + player2.web.distance * cos(angle);
+
+        if (player2.web.distance <= 0) {
             player2.web.state = "idle";
+            player2.web.x = player2.body.x;
             player2.web.y = player2.body.y;
         }
     }
 }
-
 
 /**
  * Handles the web overlapping the fly
