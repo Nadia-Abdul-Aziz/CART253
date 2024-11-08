@@ -12,13 +12,13 @@ Aesthetic: Spiders and bugs
 
 Mechanics:
 
-- frog rotation & position
+- frog rotation & position (DONE)
     - two frogs on opposite sides (player 1 & player 2)
     - Meant to fight over power tokens & flies in the common pool
     - 180 degree rotation of the frog
     - Frog cannot move on y or x axis, only rotate
 
-- Tongue & frog control
+- Tongue & frog control (DONE)
     - player 1 (top)
         - left & right arrows for rotation 
         - lower arrow to shoot tongue

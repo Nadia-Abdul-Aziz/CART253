@@ -18,12 +18,23 @@
 //Defining variables for images
 let houstonImg;
 let webImg;
+let bugImg
 
 //Loading assets
 function preload() {
     houstonImg = loadImage('assets/images/homeIcon.png');
     webImg = loadImage('assets/images/webShoot.png');
+    bugImg = loadImage('assets/images/bug.png');
 }
+
+// Bugs
+const bug = {
+    x: 0,
+    y: 200,
+    size: 50,
+    speed: 1,
+    yRange: 100,
+};
 
 //Object for keyboard rotation
 let move = {
@@ -86,10 +97,13 @@ function setup() {
 function draw() {
     background('black');
     drawBorder();
+    drawBug();
+    moveBug();
     moveSpider();
     moveweb()
     drawPlayer1();
     drawPlayer2();
+    checkWebBugOverlap();
 }
 
 function drawBorder() {
@@ -270,22 +284,37 @@ function moveweb() {
     }
 }
 
-/**
- * Handles the web overlapping the fly
- */
-// function checkwebFlyOverlap() {
-//     // Get distance from web to fly
-//     const d = dist(player1.web.x, player1.web.y, fly.x, fly.y);
-//     // Check if it's an overlap
-//     const eaten = (d < player1.web.size / 2 + fly.size / 2);
-//     if (eaten) {
-//         // Reset the fly
-//         resetFly();
-//         // Bring back the web
-//         player1.web.state = "inbound";
-//     }
-// }
+function moveBug() {
+    bug.x += bug.speed;
+    const startY = height / 2;
+    bug.y += random(-10, 10);
+    bug.y = constrain(bug.y, startY - bug.yRange, startY + bug.yRange);
+}
 
-/**
- * Launch the web on click (if it's not launched yet)
- */
+function drawBug() {
+    image(bugImg, bug.x, bug.y, bug.size, bug.size);
+}
+
+function checkWebBugOverlap() {
+    // Check overlap for player 1
+    const d1 = dist(player1.web.x, player1.web.y, bug.x, bug.y);
+    const caught1 = (d1 < player1.web.size / 2 + bug.size / 2);
+    if (caught1) {
+        resetBug();
+        player1.web.state = "inbound";
+    }
+
+    // Check overlap for player 2
+    const d2 = dist(player2.web.x, player2.web.y, bug.x, bug.y);
+    const caught2 = (d2 < player2.web.size / 2 + bug.size / 2);
+    if (caught2) {
+        resetBug();
+        player2.web.state = "inbound";
+    }
+}
+
+function resetBug() {
+    bug.x = 0;
+    bug.y = random(bug.yRange, height - bug.yRange);
+    bug.speed += 0.5;
+}
