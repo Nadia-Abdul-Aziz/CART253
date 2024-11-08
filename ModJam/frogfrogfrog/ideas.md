@@ -41,10 +41,10 @@ Mechanics:
     - fly can only come as close to the frog as the length given by 1 power token (minimum of 1 token needed to catch fly)
     - Once fly is caught, number of power tokens corresponding to the distance from the frog to the fly is used and reduces from the counter.
 
-- Grow frog
+- Grow frog (DONE)
     - flies eaten grows the frog (purpose explained later)
     - 1 fly = growth of 1?
-    - remember to constrain
+    - remember to constrain (NO CONSTRAINING NEEDED)
 
 - Fly mechanics (DONE)
     - Random fly movement in y and x?

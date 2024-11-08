@@ -34,6 +34,11 @@ let bugs = [];
 let lastSpawnTime = 0;
 const spawnInterval = 3000 //3 seconds
 
+// Variables for size counter
+
+let player1Size = 0;
+let player2Size = 0;
+
 function createBug(speed, directionChance) {
     const bug = {
         // Position (random start from left side)
@@ -51,6 +56,14 @@ function createBug(speed, directionChance) {
     };
     return bug;
 }
+
+const mine = {
+    x: 0,
+    y: 240,
+    size: 10,
+    speed: 7,
+    collisionRadius: 30
+};
 
 //Object for keyboard rotation
 let move = {
@@ -111,6 +124,7 @@ function setup() {
     createCanvas(640, 480);
     angleMode(DEGREES);
     bugs.push(createBug(5, 0.05));
+    resetMine()
 }
 
 function draw() {
@@ -122,7 +136,11 @@ function draw() {
     moveweb();
     drawPlayer1();
     drawPlayer2();
+    displaySize();
     checkAllWebBugOverlaps();
+    drawMine()
+    moveMine();
+    checkWebMineOverlap()
 }
 
 function drawBorder() {
@@ -201,6 +219,39 @@ function moveSpider() {
     }
 }
 
+function drawMine() {
+    push();
+    noStroke();
+    fill("red");
+    ellipse(mine.x, mine.y, mine.size);
+    pop();
+}
+
+function moveMine() {
+    mine.x += mine.speed;
+    if (mine.x > width) {
+        resetMine();
+    }
+}
+
+function resetMine() {
+    mine.x = 0;
+    mine.y = random(100, 380);
+}
+
+function checkWebMineOverlap() {
+    // Calculate the distance between the web and the mine
+    const distance = dist(player1.web.x, player1.web.y, player1.x, mine.y);
+
+    // Define a collision threshold
+    const collisionThreshold = (player1.web.size + mine.collisionRadius) / 2;
+
+    // Check if the distance is less than the collision threshold
+    if (distance < collisionThreshold) {
+        gameState = GAME_OVER;
+    }
+}
+
 function drawPlayer1() {
     push();
     stroke("white");
@@ -239,6 +290,24 @@ function drawPlayer2() {
     translate(player2.body.x, player2.body.y);
     rotate(player2.body.rotation);  // Apply the rotation
     image(houstonImg, 0, 0, player2.body.size + player2.body.growthAmount, player2.body.size + player2.body.growthAmount);
+    pop();
+}
+
+function displaySize() {
+    push();
+    fill('red');
+    textSize(10);
+    textStyle(BOLD);
+    textAlign(CENTER, CENTER);
+    text(player1.body.growthAmount, 320, 470);
+    pop();
+
+    push();
+    fill('red');
+    textSize(10);
+    textStyle(BOLD);
+    textAlign(CENTER, CENTER);
+    text(player2.body.growthAmount, 320, 10);
     pop();
 }
 
@@ -367,9 +436,11 @@ function checkAllWebBugOverlaps() {
             if (caught1) {
                 player1.web.state = "inbound";
                 player1.body.growthAmount += 10;
+                player1Size += 1;
             } else {
                 player2.web.state = "inbound";
                 player2.body.growthAmount += 10;
+                player2Size += 1;
             }
         }
     }
