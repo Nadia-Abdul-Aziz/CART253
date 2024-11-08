@@ -27,23 +27,30 @@ function preload() {
     bugImg = loadImage('assets/images/bug.png');
 }
 
-//Array for bug spawning 
+// Array to store all bugs
 let bugs = [];
 
-//Timer variables
+// Time variables for bug spawn
 let lastSpawnTime = 0;
-const spawnInterval = 3000;
+const spawnInterval = 3000 //3 seconds
 
-// // Bugs
-// const bug = {
-//     x: 0,
-//     y: 240,
-//     size: 50,
-//     speed: 5,
-//     yRange: 100,
-//     moveAngle: 0, //Plz why did I do this to myself and decide to use angles everywhere in this project??? 
-//     changeDirectionChance: 0.05 //Likelihood the bug switches directions and heads the other way, currently 5%
-// };
+function createBug(speed, directionChance) {
+    const bug = {
+        // Position (random start from left side)
+        x: 0,
+        y: random(height),
+        // Size (default)
+        size: 50,
+        // Movement properties (parameters)
+        speed: speed,
+        changeDirectionChance: directionChance,
+        // Random starting angle (dynamic)
+        moveAngle: random(-45, 45),
+        // Default range
+        yRange: 100
+    };
+    return bug;
+}
 
 //Object for keyboard rotation
 let move = {
@@ -101,28 +108,43 @@ let player2 = {
 function setup() {
     createCanvas(640, 480);
     angleMode(DEGREES);
-
-    //make first bug
-    spawnNewBug();
+    bugs.push(createBug(5, 0.05));
 }
 
 function draw() {
     background('black');
     drawBorder();
+    newSpawn();
     drawBug();
-    moveBug();
     moveSpider();
-    moveweb()
+    moveweb();
     drawPlayer1();
     drawPlayer2();
-    checkWebBugOverlap();
+    checkAllWebBugOverlaps();
+}
+
+function newSpawn() {
+    if (millis() - lastSpawnTime >= spawnInterval) {
+        const newSpeed = random(5, 8);
+        const newDirectionChance = random(0.05, 0.1);
+        bugs.push(createBug(newSpeed, newDirectionChance));
+        lastSpawnTime = millis();
+    }
+}
+
+function drawBug() {
+
+    for (let bug of bugs) {
+        moveSingleBug(bug);
+        drawSingleBug(bug);
+    }
 }
 
 function drawBorder() {
     push();
     noFill();
-    stroke(255); // Grey color
-    strokeWeight(5); // Border thickness
+    stroke(255); 
+    strokeWeight(5); 
     rect(0, 0, width, height);
     pop();
 }
@@ -296,102 +318,127 @@ function moveweb() {
     }
 }
 
-function spawnNewBug() {
-    bugs.push({
-        x: 0,
-        y: random(height),
-        size: 50,
-        speed: 5,
-        yRange: 100,
-        moveAngle: random(-45, 45),
-        changeDirectionChance: 0.05
-    });
-}
+// function moveBug() {
 
-function spawnBugAgain() {
+//     if (random() < bug.changeDirectionChance) {
+//         // Add a random angle change between -60 and 60 degrees to create more natural movement
+//         bug.moveAngle += random(-60, 60);
+//     }
 
-    if (millis() - lastSpawnTime > spawnInterval) {
-        spawnNewBug();
-        lastSpawnTime = millis();
-    }
+//     // Move bug based on current angle
+//     bug.x += cos(bug.moveAngle) * bug.speed;
+//     bug.y += sin(bug.moveAngle) * bug.speed;
 
-    // Update and draw all bugs
-    for (let bug of bugs) {
-        moveBug(bug);
-        drawBug(bug);
-    }
-    
-}
+//     // Check wall collisions and change direction immediately
+//     let hitWall = false;
 
+//     // Left wall
+//     if (bug.x < 0) {
+//         bug.x = 0;
+//         bug.moveAngle = -bug.moveAngle + 180;
+//         hitWall = true;
+//     }
+//     // Right wall
+//     else if (bug.x > width - bug.size) {
+//         bug.x = width - bug.size;
+//         bug.moveAngle = -bug.moveAngle + 180;
+//         hitWall = true;
+//     }
 
-function moveBug() {
+//     // Top wall
+//     if (bug.y < 0) {
+//         bug.y = 0;
+//         bug.moveAngle = -bug.moveAngle;
+//         hitWall = true;
+//     }
+//     // Bottom wall
+//     else if (bug.y > height - bug.size) {
+//         bug.y = height - bug.size;
+//         bug.moveAngle = -bug.moveAngle;
+//         hitWall = true;
+//     }
+// }
 
+// function drawBug() {
+//     image(bugImg, bug.x, bug.y, bug.size, bug.size);
+// }
+
+// function checkWebBugOverlap() {
+//     // Check overlap for player 1
+//     const d1 = dist(player1.web.x, player1.web.y, bug.x, bug.y);
+//     const caught1 = (d1 < player1.web.size / 2 + bug.size / 2);
+//     if (caught1) {
+//         resetBug();
+//         player1.web.state = "inbound";
+//     }
+
+//     // Check overlap for player 2
+//     const d2 = dist(player2.web.x, player2.web.y, bug.x, bug.y);
+//     const caught2 = (d2 < player2.web.size / 2 + bug.size / 2);
+//     if (caught2) {
+//         resetBug();
+//         player2.web.state = "inbound";
+//     }
+// }
+
+// function resetBug() {
+//     // bug.x = 0;
+//     // bug.y = random(bug.yRange, height - bug.yRange);
+//     // bug.speed += 0.5;
+//     bug.x = 0;
+//     bug.y = random(height);
+//     bug.moveAngle = random(-45, 45); // Start moving generally rightward
+// }
+
+function moveSingleBug(bug) {
     if (random() < bug.changeDirectionChance) {
-        // Add a random angle change between -60 and 60 degrees to create more natural movement
         bug.moveAngle += random(-60, 60);
     }
 
-    // Move bug based on current angle
     bug.x += cos(bug.moveAngle) * bug.speed;
     bug.y += sin(bug.moveAngle) * bug.speed;
 
-    // Check wall collisions and change direction immediately
-    let hitWall = false;
-
-    // Left wall
+    // Wall collisions
     if (bug.x < 0) {
         bug.x = 0;
         bug.moveAngle = -bug.moveAngle + 180;
-        hitWall = true;
     }
-    // Right wall
     else if (bug.x > width - bug.size) {
         bug.x = width - bug.size;
         bug.moveAngle = -bug.moveAngle + 180;
-        hitWall = true;
     }
 
-    // Top wall
     if (bug.y < 0) {
         bug.y = 0;
         bug.moveAngle = -bug.moveAngle;
-        hitWall = true;
     }
-    // Bottom wall
     else if (bug.y > height - bug.size) {
         bug.y = height - bug.size;
         bug.moveAngle = -bug.moveAngle;
-        hitWall = true;
     }
 }
 
-function drawBug() {
+function drawSingleBug(bug) {
     image(bugImg, bug.x, bug.y, bug.size, bug.size);
 }
 
-function checkWebBugOverlap() {
-    // Check overlap for player 1
-    const d1 = dist(player1.web.x, player1.web.y, bug.x, bug.y);
-    const caught1 = (d1 < player1.web.size / 2 + bug.size / 2);
-    if (caught1) {
-        resetBug();
-        player1.web.state = "inbound";
-    }
+function checkAllWebBugOverlaps() {
+    for (let bug of bugs) {
+        const d1 = dist(player1.web.x, player1.web.y, bug.x, bug.y);
+        const caught1 = (d1 < player1.web.size / 2 + bug.size / 2);
 
-    // Check overlap for player 2
-    const d2 = dist(player2.web.x, player2.web.y, bug.x, bug.y);
-    const caught2 = (d2 < player2.web.size / 2 + bug.size / 2);
-    if (caught2) {
-        resetBug();
-        player2.web.state = "inbound";
-    }
-}
+        const d2 = dist(player2.web.x, player2.web.y, bug.x, bug.y);
+        const caught2 = (d2 < player2.web.size / 2 + bug.size / 2);
 
-function resetBug() {
-    // bug.x = 0;
-    // bug.y = random(bug.yRange, height - bug.yRange);
-    // bug.speed += 0.5;
-    bug.x = 0;
-    bug.y = random(height);
-    bug.moveAngle = random(-45, 45); // Start moving generally rightward
+        if (caught1 || caught2) {
+            let index = bugs.indexOf(bug);
+            bugs.splice(index, 1);
+
+            if (caught1) {
+                player1.web.state = "inbound";
+            } else {
+                player2.web.state = "inbound";
+            }
+        }
+    }
 }
