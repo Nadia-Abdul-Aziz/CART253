@@ -30,10 +30,6 @@ function preload() {
 // Array to store all bugs
 let bugs = [];
 
-// Array to store power tokens
-
-let mines = [];
-
 // Time variables for bug spawn
 let lastSpawnTime = 0;
 const spawnInterval = 3000 //3 seconds
@@ -42,6 +38,21 @@ const spawnInterval = 3000 //3 seconds
 
 let player1Size = 0;
 let player2Size = 0;
+
+// Array to store power tokens
+
+let powerTokens = [];
+
+//Variables for power tokens
+
+//Each start with 2 tokens
+let player1Tokens = 2;
+let player2Tokens = 2;
+//Maximum that can be stored
+const maxTokens = 20;
+//Amount needed to win
+const winTokens = 20;
+
 
 function createBug(speed, directionChance) {
     const bug = {
@@ -88,7 +99,8 @@ let player1 = {
         tipSize: 75, //Different size for the tip to increase surface area
         speed: 20,
         state: "idle", //DEFAULT VALUE!!!
-        distance: 0 //distance from origin spider NEEDED FOR THE TRIG CALCULATIONS!!!
+        distance: 0, //distance from origin spider NEEDED FOR THE TRIG CALCULATIONS!!!
+        maxDistance: 0 //For power token distance calculation
     }
 };
 
@@ -109,7 +121,8 @@ let player2 = {
         tipSize: 75,
         speed: 20,
         state: "idle",
-        distance: 0
+        distance: 0,
+        maxDistance: 0
     }
 };
 
@@ -120,7 +133,7 @@ function setup() {
     createCanvas(640, 480);
     angleMode(DEGREES);
     bugs.push(createBug(5, 0.05));
-    mines.push(createMine());
+    powerTokens.push(createPowerToken());
 }
 
 function draw() {
@@ -133,9 +146,9 @@ function draw() {
     drawPlayer1();
     drawPlayer2();
     displaySize();
-    drawMines();
-    manageMines();
-    checkAllWebMineOverlaps()
+    drawPowerTokens();
+    managePowerTokens();
+    checkWebPowerTokenCollisions();
     checkAllWebBugOverlaps();
 }
 
@@ -165,16 +178,14 @@ function keyPressed() {
     }
     //Web of player 1 move
     if (keyCode === UP_ARROW) {
-        // Only move the web if it is currently idle
-        if (player1.web.state === "idle") {
+        if (player1.web.state === "idle" && player1Tokens > 0) {
             player1.web.state = "outbound";
             player1.web.distance = 0;
         }
     }
 
-    if (keyCode === 83) {
-        // Only move the web if it is currently idle
-        if (player2.web.state === "idle") {
+    if (keyCode === 83) { // S key
+        if (player2.web.state === "idle" && player2Tokens > 0) {
             player2.web.state = "outbound";
             player2.web.distance = 0;
         }
@@ -215,69 +226,78 @@ function moveSpider() {
     }
 }
 
-function createMine() {
+// creating token properties
+function createPowerToken() {
     return {
         x: 0,
-        y: random(100, 380),
-        size: 10,
+        y: random(50, 430), // generation bounds, minimum distance of 1 token (50px)
+        size: 15,
         speed: 7,
-        collisionRadius: 30
+        value: 1 // power tokens given when collected
     };
 }
 
-// Draw all mines
-function drawMines() {
-    for (let mine of mines) {
+// Drawing the power token, appearance
+function drawPowerTokens() {
+    for (let token of powerTokens) {
         push();
         noStroke();
-        fill("red");
-        ellipse(mine.x, mine.y, mine.size);
+        fill("yellow");
+        ellipse(token.x, token.y, token.size);
+        fill("black");
+        textSize(10);
+        textAlign(CENTER, CENTER);
+        text("+", token.x, token.y); //Plus symbol in the middle
         pop();
     }
 }
 
-// Move and manage mines
-function manageMines() {
-    for (let i = mines.length - 1; i >= 0; i--) {
-        let mine = mines[i];
+function calculateTokenCost(distance) {
+    return Math.ceil(distance / 50);
+}
 
-        // Move the mine
-        mine.x += mine.speed;
-
-        // Spawn new mine at halfway point
-        if (mine.x >= width / 2 && mines.length === 1) {
-            mines.push(createMine());
+// power token spawn logic
+// Checked a few tutorials because...this was hard
+function managePowerTokens() {
+    for (let i = powerTokens.length - 1; i >= 0; i--) {
+        let token = powerTokens[i];
+        token.x += token.speed;
+        //Generate new token once initial one reaches half the canvas
+        if (token.x >= width / 2 && powerTokens.length === 1) {
+            powerTokens.push(createPowerToken());
         }
-
-        // Remove mine if it goes off screen
-        if (mine.x > width) {
-            mines.splice(i, 1);
-            // If no mines left, create a new one
-            if (mines.length === 0) {
-                mines.push(createMine());
+        // generate new one if the token reaches the end of the canvas
+        if (token.x > width) {
+            powerTokens.splice(i, 1);
+            if (powerTokens.length === 0) {
+                powerTokens.push(createPowerToken());
             }
         }
     }
 }
 
 // Check web collision with all mines
-function checkAllWebMineOverlaps() {
-    for (let mine of mines) {
+function checkWebPowerTokenCollisions() {
+    for (let i = powerTokens.length - 1; i >= 0; i--) {
+        let token = powerTokens[i];
+
         // Check collision with player 1's web
-        const distance1 = dist(player1.web.x, player1.web.y, mine.x, mine.y);
-        if (distance1 < (player1.web.size + mine.collisionRadius) / 2) {
-            gameState = GAME_OVER;
-            return;
+        const distance1 = dist(player1.web.x, player1.web.y, token.x, token.y);
+        if (distance1 < (player1.web.tipSize + token.size) / 2) {
+            player1Tokens = Math.min(maxTokens, player1Tokens + token.value);
+            powerTokens.splice(i, 1);
+            continue;
         }
 
         // Check collision with player 2's web
-        const distance2 = dist(player2.web.x, player2.web.y, mine.x, mine.y);
-        if (distance2 < (player2.web.size + mine.collisionRadius) / 2) {
-            gameState = GAME_OVER;
-            return;
+        const distance2 = dist(player2.web.x, player2.web.y, token.x, token.y);
+        if (distance2 < (player2.web.tipSize + token.size) / 2) {
+            player2Tokens = Math.min(maxTokens, player2Tokens + token.value);
+            powerTokens.splice(i, 1);
         }
     }
 }
+
 
 function drawPlayer1() {
     push();
@@ -322,85 +342,116 @@ function drawPlayer2() {
 
 function displaySize() {
     push();
-    fill('red');
-    textSize(10);
+    fill('yellow');
+    textSize(16);
     textStyle(BOLD);
     textAlign(CENTER, CENTER);
-    text(player1.body.growthAmount, 320, 470);
+    text(`Tokens: ${player1Tokens}`, 50, 470);
+    text(`Size: ${player1.body.growthAmount}`, 320, 470);
     pop();
 
     push();
-    fill('red');
-    textSize(10);
+    fill('yellow');
+    textSize(16);
     textStyle(BOLD);
     textAlign(CENTER, CENTER);
-    text(player2.body.growthAmount, 320, 10);
+    text(`Tokens: ${player2Tokens}`, 50, 10);
+    text(`Size: ${player2.body.growthAmount}`, 320, 10);
     pop();
 }
 
 function moveweb() {
-    // Player 1 
+    // Player 1 Web Logic
     if (player1.web.state === "idle") {
+        // Reset web position and distance when idle
         player1.web.x = player1.body.x;
         player1.web.y = player1.body.y;
-        player1.web.distance = 0; //default distance is zero
+        player1.web.distance = 0;
     }
     else if (player1.web.state === "outbound") {
-        player1.web.distance += player1.web.speed; //calculate position based on angle and distance
-        let angle = -player1.body.rotation - 180; //using reversed angle
-        player1.web.x = player1.body.x + player1.web.distance * sin(angle);
-        player1.web.y = player1.body.y + player1.web.distance * cos(angle)
+        // Calculate max allowed distance based on tokens
+        const maxDistance = player1Tokens * 50; // Each token allows 50 pixels
 
-        //border collision adjusted to include hits to any border, with the exception of the same side the spider is on
-        if (player1.web.y <= 0 || player1.web.x <= 0 || player1.web.x >= width) {
+        // Update web position
+        player1.web.distance += player1.web.speed;
+        let angle = -player1.body.rotation - 180;
+        player1.web.x = player1.body.x + player1.web.distance * sin(angle);
+        player1.web.y = player1.body.y + player1.web.distance * cos(angle);
+
+        // Store the maximum distance reached for token cost calculation
+        player1.web.maxDistance = player1.web.distance;
+
+        // Check for maximum distance or border collision
+        if (player1.web.distance >= maxDistance ||
+            player1.web.y <= 0 ||
+            player1.web.x <= 0 ||
+            player1.web.x >= width) {
             player1.web.state = "inbound";
         }
     }
     else if (player1.web.state === "inbound") {
+        // Retract web
         player1.web.distance -= player1.web.speed;
         let angle = -player1.body.rotation - 180;
         player1.web.x = player1.body.x + player1.web.distance * sin(angle);
         player1.web.y = player1.body.y + player1.web.distance * cos(angle);
 
+        // Reset when fully retracted
         if (player1.web.distance <= 0) {
             player1.web.state = "idle";
             player1.web.x = player1.body.x;
             player1.web.y = player1.body.y;
+            player1.web.distance = 0;
         }
     }
 
-    // Player 2
+    // Player 2 Web Logic
     if (player2.web.state === "idle") {
         player2.web.x = player2.body.x;
         player2.web.y = player2.body.y;
         player2.web.distance = 0;
     }
     else if (player2.web.state === "outbound") {
+        // Calculate max allowed distance based on tokens
+        const maxDistance = player2Tokens * 50;
+
+        // Update web position
         player2.web.distance += player2.web.speed;
         let angle = -player2.body.rotation;
         player2.web.x = player2.body.x + player2.web.distance * sin(angle);
         player2.web.y = player2.body.y + player2.web.distance * cos(angle);
 
-        if (player2.web.y >= height || player2.web.x <= 0 || player2.web.x >= width) {
+        // Store the maximum distance reached for token cost calculation
+        player2.web.maxDistance = player2.web.distance;
+
+        // Check for maximum distance or border collision
+        if (player2.web.distance >= maxDistance ||
+            player2.web.y >= height ||
+            player2.web.x <= 0 ||
+            player2.web.x >= width) {
             player2.web.state = "inbound";
         }
     }
     else if (player2.web.state === "inbound") {
+        // Retract web
         player2.web.distance -= player2.web.speed;
         let angle = -player2.body.rotation;
         player2.web.x = player2.body.x + player2.web.distance * sin(angle);
         player2.web.y = player2.body.y + player2.web.distance * cos(angle);
 
+        // Reset when fully retracted
         if (player2.web.distance <= 0) {
             player2.web.state = "idle";
             player2.web.x = player2.body.x;
             player2.web.y = player2.body.y;
+            player2.web.distance = 0;
         }
     }
 }
 
 function newSpawn() {
-    if (millis() - lastSpawnTime >= spawnInterval) {
+    // Constraining to max 10 bugs
+    if (bugs.length < 10 && millis() - lastSpawnTime >= spawnInterval) {
         const newSpeed = random(5, 8);
         const newDirectionChance = random(0.05, 0.1);
         bugs.push(createBug(newSpeed, newDirectionChance));
@@ -421,6 +472,7 @@ function moveSingleBug(bug) {
         bug.moveAngle += random(-60, 60);
     }
 
+    /// I don't know anymore with this trig stuff, I just look at documentation and assume it'll work, I wrote it a while ago and I don't actually know what this does, it does something. 
     bug.x += cos(bug.moveAngle) * bug.speed;
     bug.y += sin(bug.moveAngle) * bug.speed;
 
@@ -450,17 +502,24 @@ function drawSingleBug(bug) {
 
 function checkAllWebBugOverlaps() {
     for (let bug of bugs) {
-        // Only check collisions if the web is outbound or inbound
         if (player1.web.state !== "idle") {
             const d1 = dist(player1.web.x, player1.web.y, bug.x, bug.y);
             const caught1 = (d1 < player1.web.size / 2 + bug.size / 2);
 
             if (caught1) {
+                const tokenCost = calculateTokenCost(player1.web.distance);
+                player1Tokens -= tokenCost;
+
+                if (player1Tokens <= 0) {
+                    gameState = GAME_OVER;
+                    return;
+                }
+
                 bugs.splice(bugs.indexOf(bug), 1);
                 player1.web.state = "inbound";
                 player1.body.growthAmount += 10;
                 player1Size += 1;
-                continue; // Skip further checks if the bug is already caught
+                continue;
             }
         }
 
@@ -469,6 +528,14 @@ function checkAllWebBugOverlaps() {
             const caught2 = (d2 < player2.web.size / 2 + bug.size / 2);
 
             if (caught2) {
+                const tokenCost = calculateTokenCost(player2.web.distance);
+                player2Tokens -= tokenCost;
+
+                if (player2Tokens <= 0) {
+                    gameState = GAME_OVER;
+                    return;
+                }
+
                 bugs.splice(bugs.indexOf(bug), 1);
                 player2.web.state = "inbound";
                 player2.body.growthAmount += 10;
