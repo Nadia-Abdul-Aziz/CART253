@@ -257,11 +257,8 @@ function calculateTokenCost(distance) {
 }
 
 // power token spawn logic
-// Checked a few tutorials because...this was hard
+// Checked a few tutorials because this was hard
 function managePowerTokens() {
-
-    //New variable to determine whether I need a new token or not
-    let needNewToken = false;
 
     for (let i = powerTokens.length - 1; i >= 0; i--) {
         let token = powerTokens[i];
@@ -290,14 +287,17 @@ function checkWebPowerTokenCollisions() {
         if (distance1 < (player1.web.tipSize + token.size) / 2) {
             player1Tokens = Math.min(maxTokens, player1Tokens + token.value);
             powerTokens.splice(i, 1);
+            player1.web.state = "inbound";
             continue;
+
         }
 
         // Check collision with player 2's web
         const distance2 = dist(player2.web.x, player2.web.y, token.x, token.y);
         if (distance2 < (player2.web.tipSize + token.size) / 2) {
             player2Tokens = Math.min(maxTokens, player2Tokens + token.value);
-            powerTokens.splice(i, 1);
+            powerTokens.splice(i, 1);  
+            player2.web.state = "inbound";
         }
     }
 }
