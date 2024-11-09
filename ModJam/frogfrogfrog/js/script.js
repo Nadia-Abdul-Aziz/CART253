@@ -450,21 +450,26 @@ function drawSingleBug(bug) {
 
 function checkAllWebBugOverlaps() {
     for (let bug of bugs) {
-        const d1 = dist(player1.web.x, player1.web.y, bug.x, bug.y);
-        const caught1 = (d1 < player1.web.size / 2 + bug.size / 2);
-
-        const d2 = dist(player2.web.x, player2.web.y, bug.x, bug.y);
-        const caught2 = (d2 < player2.web.size / 2 + bug.size / 2);
-
-        if (caught1 || caught2) {
-            let index = bugs.indexOf(bug);
-            bugs.splice(index, 1);
+        // Only check collisions if the web is outbound or inbound
+        if (player1.web.state !== "idle") {
+            const d1 = dist(player1.web.x, player1.web.y, bug.x, bug.y);
+            const caught1 = (d1 < player1.web.size / 2 + bug.size / 2);
 
             if (caught1) {
+                bugs.splice(bugs.indexOf(bug), 1);
                 player1.web.state = "inbound";
                 player1.body.growthAmount += 10;
                 player1Size += 1;
-            } else {
+                continue; // Skip further checks if the bug is already caught
+            }
+        }
+
+        if (player2.web.state !== "idle") {
+            const d2 = dist(player2.web.x, player2.web.y, bug.x, bug.y);
+            const caught2 = (d2 < player2.web.size / 2 + bug.size / 2);
+
+            if (caught2) {
+                bugs.splice(bugs.indexOf(bug), 1);
                 player2.web.state = "inbound";
                 player2.body.growthAmount += 10;
                 player2Size += 1;
