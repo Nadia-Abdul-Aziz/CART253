@@ -27,6 +27,15 @@ function preload() {
     bugImg = loadImage('assets/images/bug.png');
 }
 
+//Game States
+const gameTitle = 'title';
+const gamePlaying = 'playing';
+const gameOver = 'game over';
+const gameWon = 'game won'
+
+//Default state, starts on the title screen
+let gameState = gamePlaying;
+
 // Array to store all bugs
 let bugs = [];
 
@@ -49,9 +58,9 @@ let powerTokens = [];
 let player1Tokens = 2;
 let player2Tokens = 2;
 //Maximum that can be stored
-const maxTokens = 20;
+const maxTokens = 10;
 //Amount needed to win
-const winTokens = 20;
+const winTokens = 10;
 
 
 function createBug(speed, directionChance) {
@@ -139,17 +148,35 @@ function setup() {
 function draw() {
     background('black');
     drawBorder();
-    newSpawn();
-    drawBug();
-    moveSpider();
-    moveweb();
-    drawPlayer1();
-    drawPlayer2();
-    displaySize();
-    drawPowerTokens();
-    managePowerTokens();
-    checkWebPowerTokenCollisions();
-    checkAllWebBugOverlaps();
+
+    switch (gameState) {
+        case gamePlaying:
+            newSpawn();
+            drawBug();
+            moveSpider();
+            moveweb();
+            drawPlayer1();
+            drawPlayer2();
+            displaySize();
+            drawPowerTokens();
+            managePowerTokens();
+            checkWebPowerTokenCollisions();
+            checkAllWebBugOverlaps();
+            checkWinCondition();
+            break;
+        case gameWon:
+            if (!gameWonInitialized) {
+                initializeGameWon();
+                gameWonInitialized = true;
+            }
+            break;
+        case gameOver:
+            if (!gameOverInitialized) {
+                initializeGameOver();
+                gameOverInitialized = true;
+            }
+            break;
+    }
 }
 
 function drawBorder() {
@@ -296,11 +323,12 @@ function checkWebPowerTokenCollisions() {
         const distance2 = dist(player2.web.x, player2.web.y, token.x, token.y);
         if (distance2 < (player2.web.tipSize + token.size) / 2) {
             player2Tokens = Math.min(maxTokens, player2Tokens + token.value);
-            powerTokens.splice(i, 1);  
+            powerTokens.splice(i, 1);
             player2.web.state = "inbound";
         }
     }
 }
+
 
 
 function drawPlayer1() {
@@ -350,8 +378,8 @@ function displaySize() {
     textSize(16);
     textStyle(BOLD);
     textAlign(CENTER, CENTER);
-    text(`Tokens: ${player1Tokens}`, 50, 470);
-    text(`Size: ${player1.body.growthAmount}`, 320, 470);
+    text('Tokens: ' + player1Tokens, 50, 460);
+    text('Size: ' + player1.body.growthAmount, 590, 460);
     pop();
 
     push();
@@ -359,8 +387,8 @@ function displaySize() {
     textSize(16);
     textStyle(BOLD);
     textAlign(CENTER, CENTER);
-    text(`Tokens: ${player2Tokens}`, 50, 10);
-    text(`Size: ${player2.body.growthAmount}`, 320, 10);
+    text('Tokens: ' + player2Tokens, 50, 20);
+    text('Size: ' + player2.body.growthAmount, 590, 20);
     pop();
 }
 
@@ -455,7 +483,7 @@ function moveweb() {
 
 function newSpawn() {
     // Constraining to max 10 bugs
-    if (bugs.length < 10 && millis() - lastSpawnTime >= spawnInterval) {
+    if (bugs.length < 5 && millis() - lastSpawnTime >= spawnInterval) {
         const newSpeed = random(5, 8);
         const newDirectionChance = random(0.05, 0.1);
         bugs.push(createBug(newSpeed, newDirectionChance));
@@ -544,6 +572,30 @@ function checkAllWebBugOverlaps() {
                 player2.web.state = "inbound";
                 player2.body.growthAmount += 10;
                 player2Size += 1;
+            }
+        }
+    }
+}
+
+function checkWinCondition() {
+    // Check if player1 meets win conditions
+    if ((player2.body.growthAmount === 0 && player1.body.growthAmount >= 10) ||
+        (player2.body.growthAmount > 0 && player1.body.growthAmount >= player2.body.growthAmount * 2)) {
+        if (player1Tokens >= winTokens) {
+            let distanceToPlayer2 = dist(player1.web.x, player1.web.y, player2.body.x, player2.body.y);
+            if (distanceToPlayer2 < (player1.web.tipSize + player2.body.size) / 2) {
+                gameState = gameWon;
+            }
+        }
+    }
+
+    // Check if player2 meets win conditions
+    if ((player1.body.growthAmount === 0 && player2.body.growthAmount >= 10) ||
+        (player1.body.growthAmount > 0 && player2.body.growthAmount >= player1.body.growthAmount * 2)) {
+        if (player2Tokens >= winTokens) {
+            let distanceToPlayer1 = dist(player2.web.x, player2.web.y, player1.body.x, player1.body.y);
+            if (distanceToPlayer1 < (player2.web.tipSize + player1.body.size) / 2) {
+                gameState = gameWon;
             }
         }
     }
