@@ -32,7 +32,7 @@ let bugs = [];
 
 // Time variables for bug spawn
 let lastSpawnTime = 0;
-const spawnInterval = 3000 //3 seconds
+const spawnInterval = 5000 //5 seconds
 
 // Variables for size counter
 
@@ -259,6 +259,10 @@ function calculateTokenCost(distance) {
 // power token spawn logic
 // Checked a few tutorials because...this was hard
 function managePowerTokens() {
+
+    //New variable to determine whether I need a new token or not
+    let needNewToken = false;
+
     for (let i = powerTokens.length - 1; i >= 0; i--) {
         let token = powerTokens[i];
         token.x += token.speed;
@@ -269,10 +273,10 @@ function managePowerTokens() {
         // generate new one if the token reaches the end of the canvas
         if (token.x > width) {
             powerTokens.splice(i, 1);
-            if (powerTokens.length === 0) {
-                powerTokens.push(createPowerToken());
-            }
         }
+    }
+    if (powerTokens.length === 0) {
+        powerTokens.push(createPowerToken());
     }
 }
 
