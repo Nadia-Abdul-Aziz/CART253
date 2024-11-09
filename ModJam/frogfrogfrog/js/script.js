@@ -30,6 +30,10 @@ function preload() {
 // Array to store all bugs
 let bugs = [];
 
+// Array to store power tokens
+
+let mines = [];
+
 // Time variables for bug spawn
 let lastSpawnTime = 0;
 const spawnInterval = 3000 //3 seconds
@@ -56,14 +60,6 @@ function createBug(speed, directionChance) {
     };
     return bug;
 }
-
-const mine = {
-    x: 0,
-    y: 240,
-    size: 10,
-    speed: 7,
-    collisionRadius: 30
-};
 
 //Object for keyboard rotation
 let move = {
@@ -124,7 +120,7 @@ function setup() {
     createCanvas(640, 480);
     angleMode(DEGREES);
     bugs.push(createBug(5, 0.05));
-    resetMine()
+    mines.push(createMine());
 }
 
 function draw() {
@@ -137,10 +133,10 @@ function draw() {
     drawPlayer1();
     drawPlayer2();
     displaySize();
+    drawMines();
+    manageMines();
+    checkAllWebMineOverlaps()
     checkAllWebBugOverlaps();
-    drawMine()
-    moveMine();
-    checkWebMineOverlap()
 }
 
 function drawBorder() {
@@ -219,36 +215,67 @@ function moveSpider() {
     }
 }
 
-function drawMine() {
-    push();
-    noStroke();
-    fill("red");
-    ellipse(mine.x, mine.y, mine.size);
-    pop();
+function createMine() {
+    return {
+        x: 0,
+        y: random(100, 380),
+        size: 10,
+        speed: 7,
+        collisionRadius: 30
+    };
 }
 
-function moveMine() {
-    mine.x += mine.speed;
-    if (mine.x > width) {
-        resetMine();
+// Draw all mines
+function drawMines() {
+    for (let mine of mines) {
+        push();
+        noStroke();
+        fill("red");
+        ellipse(mine.x, mine.y, mine.size);
+        pop();
     }
 }
 
-function resetMine() {
-    mine.x = 0;
-    mine.y = random(100, 380);
+// Move and manage mines
+function manageMines() {
+    for (let i = mines.length - 1; i >= 0; i--) {
+        let mine = mines[i];
+
+        // Move the mine
+        mine.x += mine.speed;
+
+        // Spawn new mine at halfway point
+        if (mine.x >= width / 2 && mines.length === 1) {
+            mines.push(createMine());
+        }
+
+        // Remove mine if it goes off screen
+        if (mine.x > width) {
+            mines.splice(i, 1);
+            // If no mines left, create a new one
+            if (mines.length === 0) {
+                mines.push(createMine());
+            }
+        }
+    }
 }
 
-function checkWebMineOverlap() {
-    // Calculate the distance between the web and the mine
-    const distance = dist(player1.web.x, player1.web.y, player1.x, mine.y);
+// Check web collision with all mines
+function checkAllWebMineOverlaps() {
+    for (let mine of mines) {
+        // Check collision with player 1's web
+        const distance1 = dist(player1.web.x, player1.web.y, mine.x, mine.y);
+        if (distance1 < (player1.web.size + mine.collisionRadius) / 2) {
+            gameState = GAME_OVER;
+            return;
+        }
 
-    // Define a collision threshold
-    const collisionThreshold = (player1.web.size + mine.collisionRadius) / 2;
-
-    // Check if the distance is less than the collision threshold
-    if (distance < collisionThreshold) {
-        gameState = GAME_OVER;
+        // Check collision with player 2's web
+        const distance2 = dist(player2.web.x, player2.web.y, mine.x, mine.y);
+        if (distance2 < (player2.web.size + mine.collisionRadius) / 2) {
+            gameState = GAME_OVER;
+            return;
+        }
     }
 }
 
