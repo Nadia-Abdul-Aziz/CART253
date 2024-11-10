@@ -1,13 +1,25 @@
 /**
- * player1
- * Pippin Barr
+ * SpiderSpiderSpider
  * 
- * A game of catching flies with your player1-web
+ * Nadia Abdul Aziz
  * 
- * Instructions:
- * - Move the player1 with your mouse
- * - Click to launch the web
- * - Catch flies
+ * A multiplayer game where you collect power to eat bugs, then get bigger than your opponent to eventually eat them. 
+ * Based on the original code of FrogFrogFrog, and inspired by my website being created for CART211
+ * 
+ * Instructions & explanation (SEE IDEA DOCUMENT FOR MORE DETAILS):
+ * - Each player begins with 2 default power tokens
+ * - Tokens are used to power the spider's web, the more tokens you have, the farther your web will go.
+ * - Collect yellow power tokens with your web
+ * - Player 1 controls = arrow keys + up key
+ * - Player 2 controls = A/D + S
+ * - Spider itself does not move, only rotate 
+ * - Power bank maximum is 10, 10 tokens are needed to reach the end of the canvas, and synonymously to eat your opponent. 
+ * - Catch bugs with your web to grow in size
+ * - Each bug eaten results in a growth value of 10
+ * - Depending on the distance of the bug from your spider, the corresponding amount of power tokens will be substracted
+ * - Having zero tokens left results in an automatic loss
+ * - Regardless of your opponent's size, you must be double their size to eat them (with the exception of an opponent at no growth, in which case you must be at 10)
+ * - To win you must be able to both reach your opponent, and be double their size. 
  * 
  * Made with p5
  * https://p5js.org/
@@ -35,8 +47,6 @@ const gameWon = 'game won'
 //Default state, starts on the title screen
 let gameState = gameTitle;
 
-let gameWonInitialized = false;
-
 //Variable to insert reason for player 1 or 2 winning in win screen.
 let winReason = '';
 
@@ -58,12 +68,13 @@ let player2Size = 0;
 let player1Tokens = 2;
 let player2Tokens = 2;
 
-//Maximum that can be stored
+//Maximum that can be stored in the bank
 const maxTokens = 10;
+
 //Amount needed to win
 const winTokens = 10;
 
-//Object for keyboard rotation
+//Object for keyboard rotation (Both players)
 let move = {
     leftKeyActive: false,
     rightKeyActive: false,
@@ -71,6 +82,7 @@ let move = {
     dKeyActive: false,
 }
 
+//Start & play again button object
 let button = {
     width: 100,
     height: 40,
@@ -82,20 +94,20 @@ let player1 = {
     body: {
         x: 320,
         y: 480,
-        size: 150,
-        speed: 10,
-        rotation: 0, //DEFAULT VALUE!!!!
-        growthAmount: 0 //DEFAULT VALUE!!!!
+        size: 150, //Starting size
+        rotation: 0, //DEFAULT VALUE, no rotation
+        growthAmount: 0 //Amount of growth gained (to show on visual counter)
     },
-    //Thing the spider shoots to catch bugs
+
+    //Web the spider shoots to catch bugs
     web: {
         x: 320,
         y: 480,
         size: 1,
         tipSize: 75, //Different size for the tip to increase surface area
         speed: 20,
-        state: "idle", //DEFAULT VALUE!!!
-        distance: 0, //distance from origin spider NEEDED FOR THE TRIG CALCULATIONS!!!
+        state: "idle", //DEFAULT VALUE
+        distance: 0, //distance from origin spider NEEDED FOR THE TRIG CALCULATIONS
         maxDistance: 0 //For power token distance calculation
     }
 };
@@ -106,7 +118,6 @@ let player2 = {
         x: 320,
         y: 0,
         size: 150,
-        speed: 10,
         rotation: 0,
         growthAmount: 0
     },
@@ -121,34 +132,40 @@ let player2 = {
         maxDistance: 0
     }
 };
-// Had to be here for some reason, else it wouldn't run
+
+//Making the bug
+// Had to be up here, else it wouldn't run
 function createBug(speed, directionChance) {
     const bug = {
         // Position (random start from left side)
         x: 0,
         y: random(height),
-        // Size (default)
+        // Size
         size: 50,
-        // Movement properties (parameters)
+        // Movement properties
         speed: speed,
         changeDirectionChance: directionChance,
         // Random starting angle (dynamic)
         moveAngle: random(-45, 45),
         // Default range
-        yRange: 100
     };
     return bug;
 }
 
-/**
- * Creates the canvas and initializes the fly
- */
+// Creates the canvas and initializes the bugs/tokens and sets angle mode
+
 function setup() {
     createCanvas(640, 480);
     angleMode(DEGREES);
+    // Creates the first bug and adds it to the bug array
+    // 5 = speed of the bug
+    // 0.05 = 5% chance to change direction each frame
     bugs.push(createBug(5, 0.05));
+    //Creates the first power token and adds it to the array
     powerTokens.push(createPowerToken());
 }
+
+//Contains the switch statement for all game states 
 function draw() {
     background('black');
     switch (gameState) {
@@ -159,12 +176,12 @@ function draw() {
             drawBorder();
             newSpawn();
             drawBug();
-            moveSpider();
-            moveweb();
+            drawPowerTokens();
             drawPlayer1();
             drawPlayer2();
+            moveSpider();
+            moveWeb();
             displaySize();
-            drawPowerTokens();
             managePowerTokens();
             checkWebPowerTokenCollisions();
             checkAllWebBugOverlaps();
@@ -195,6 +212,9 @@ function drawTitleScreen() {
     fill('black');
     textSize(24);
     text('Start', width / 2, height * 0.3);
+    fill('white');
+    textSize(12);
+    text('[SPACEBAR]', width / 2, height * 0.4);
     textSize(10);
     // Left side - Game Instructions
     fill('white');
@@ -208,20 +228,21 @@ function drawTitleScreen() {
 
     textSize(18);
     textStyle(BOLD);
-    text('HOW TO PLAY:', leftX, height * 0.5);
+    text('HOW TO WIN:', leftX, height * 0.5);
 
     // Game rules
     textStyle(NORMAL);
     textSize(14);
 
-    text('1. Catch bugs to grow bigger', leftX, startY);
-    text('2. Collect power tokens to extend your web', leftX, startY + lineSpacing);
-    text('3. Grow twice as big as your opponent', leftX, startY + lineSpacing * 2);
-    text('4. Use your web to catch them!', leftX, startY + lineSpacing * 3);
+    text('1. Collect power tokens to extend your web!', leftX, startY);
+    text('2. Eat bugs to grow bigger!', leftX, startY + lineSpacing);
+    text('3. Catching farther bugs will use more power!', leftX, startY + lineSpacing * 2);
+    text('4. Grow twice as big as your opponent!', leftX, startY + lineSpacing * 3);
+    text('5. Devour your opponent with your web!', leftX, startY + lineSpacing * 4);
 
     textSize(12);
     textStyle(ITALIC);
-    text('Warning: Running out of tokens means defeat!', leftX, startY + lineSpacing * 4);
+    text('Warning: Running out of tokens means defeat!', width / 2, startY + lineSpacing * 7);
 
     // Right side - Controls
     textStyle(BOLD);
@@ -263,8 +284,9 @@ function drawGameWonScreen() {
 
     // Button text
     fill('black');
-    textSize(24);
+    textSize(14);
     text('Play Again', width / 2, height / 2 + 40);
+    pop();
 }
 
 
@@ -286,7 +308,6 @@ function resetGame() {
     powerTokens = [];
 
     // Erase game won data
-    gameWonInitialized = false;
     winReason = '';
 
     // Add initial bug and power token
@@ -474,7 +495,7 @@ function drawPlayer1() {
     translate(player1.body.x, player1.body.y);
     rotate(180);
     rotate(player1.body.rotation);
-    image(houstonImg, 0, 0, player1.body.size + player1.body.growthAmount, player1.body.size + player1.body.growthAmount);
+    image(houstonImg, 0, 0, player1.body.size + player1.body.growthAmount * 3, player1.body.size + player1.body.growthAmount * 3);
     pop();
 }
 
@@ -496,7 +517,7 @@ function drawPlayer2() {
     imageMode(CENTER);
     translate(player2.body.x, player2.body.y);
     rotate(player2.body.rotation);  // Apply the rotation
-    image(houstonImg, 0, 0, player2.body.size + player2.body.growthAmount, player2.body.size + player2.body.growthAmount);
+    image(houstonImg, 0, 0, player2.body.size + player2.body.growthAmount * 3, player2.body.size + player2.body.growthAmount * 3);
     pop();
 }
 
@@ -520,7 +541,7 @@ function displaySize() {
     pop();
 }
 
-function moveweb() {
+function moveWeb() {
     // Player 1 Web Logic
     if (player1.web.state === "idle") {
         // Reset web position and distance when idle
@@ -672,7 +693,7 @@ function checkAllWebBugOverlaps() {
 
                 if (player1Tokens <= 0) {
                     gameState = gameWon;
-                    winReason = 'PLAYER 2 WINS! - Player 1 ran out of tokens!';
+                    winReason = 'PLAYER 2 WINS! Player 1 ran out of power...';
                     return;
                 }
 
@@ -694,7 +715,7 @@ function checkAllWebBugOverlaps() {
 
                 if (player2Tokens <= 0) {
                     gameState = gameWon;
-                    winReason = 'PLAYER 1 WINS! - Player 2 ran out of tokens!';
+                    winReason = 'PLAYER 1 WINS! Player 2 ran out of power...';
                     return;
                 }
 
@@ -715,7 +736,7 @@ function checkWinCondition() {
             let distanceToPlayer2 = dist(player1.web.x, player1.web.y, player2.body.x, player2.body.y);
             if (distanceToPlayer2 < (player1.web.tipSize + player2.body.size) / 2) {
                 gameState = gameWon;
-                winReason = 'PLAYER 1 WINS! - Player 2 was Eaten!';
+                winReason = 'PLAYER 1 WINS! PLAYER 2 WAS DEVOURED!';
             }
         }
     }
@@ -727,7 +748,7 @@ function checkWinCondition() {
             let distanceToPlayer1 = dist(player2.web.x, player2.web.y, player1.body.x, player1.body.y);
             if (distanceToPlayer1 < (player2.web.tipSize + player1.body.size) / 2) {
                 gameState = gameWon;
-                winReason = 'PLAYER 2 WINS! - Player 1 was Eaten!';
+                winReason = 'PLAYER 2 WINS! PLAYER 1 WAS DEVOURED!';
             }
         }
     }
