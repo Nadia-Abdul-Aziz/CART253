@@ -30,56 +30,38 @@ function preload() {
 //Game States
 const gameTitle = 'title';
 const gamePlaying = 'playing';
-const gameOver = 'game over';
 const gameWon = 'game won'
 
 //Default state, starts on the title screen
-let gameState = gamePlaying;
+let gameState = gameTitle;
 
-// Array to store all bugs
+let gameWonInitialized = false;
+
+//Variable to insert reason for player 1 or 2 winning in win screen.
+let winReason = '';
+
+// Array to store bugs
 let bugs = [];
+
+// Array to store power tokens
+let powerTokens = [];
 
 // Time variables for bug spawn
 let lastSpawnTime = 0;
 const spawnInterval = 5000 //5 seconds
 
 // Variables for size counter
-
 let player1Size = 0;
 let player2Size = 0;
-
-// Array to store power tokens
-
-let powerTokens = [];
-
-//Variables for power tokens
 
 //Each start with 2 tokens
 let player1Tokens = 2;
 let player2Tokens = 2;
+
 //Maximum that can be stored
 const maxTokens = 10;
 //Amount needed to win
 const winTokens = 10;
-
-
-function createBug(speed, directionChance) {
-    const bug = {
-        // Position (random start from left side)
-        x: 0,
-        y: random(height),
-        // Size (default)
-        size: 50,
-        // Movement properties (parameters)
-        speed: speed,
-        changeDirectionChance: directionChance,
-        // Random starting angle (dynamic)
-        moveAngle: random(-45, 45),
-        // Default range
-        yRange: 100
-    };
-    return bug;
-}
 
 //Object for keyboard rotation
 let move = {
@@ -87,6 +69,11 @@ let move = {
     rightKeyActive: false,
     aKeyActive: false,
     dKeyActive: false,
+}
+
+let button = {
+    width: 100,
+    height: 40,
 }
 
 // Spiders
@@ -134,6 +121,24 @@ let player2 = {
         maxDistance: 0
     }
 };
+// Had to be here for some reason, else it wouldn't run
+function createBug(speed, directionChance) {
+    const bug = {
+        // Position (random start from left side)
+        x: 0,
+        y: random(height),
+        // Size (default)
+        size: 50,
+        // Movement properties (parameters)
+        speed: speed,
+        changeDirectionChance: directionChance,
+        // Random starting angle (dynamic)
+        moveAngle: random(-45, 45),
+        // Default range
+        yRange: 100
+    };
+    return bug;
+}
 
 /**
  * Creates the canvas and initializes the fly
@@ -144,13 +149,14 @@ function setup() {
     bugs.push(createBug(5, 0.05));
     powerTokens.push(createPowerToken());
 }
-
 function draw() {
     background('black');
-    drawBorder();
-
     switch (gameState) {
+        case gameTitle:
+            drawTitleScreen();
+            break;
         case gamePlaying:
+            drawBorder();
             newSpawn();
             drawBug();
             moveSpider();
@@ -165,19 +171,129 @@ function draw() {
             checkWinCondition();
             break;
         case gameWon:
-            if (!gameWonInitialized) {
-                initializeGameWon();
-                gameWonInitialized = true;
-            }
-            break;
-        case gameOver:
-            if (!gameOverInitialized) {
-                initializeGameOver();
-                gameOverInitialized = true;
-            }
+            drawGameWonScreen();
             break;
     }
 }
+
+function drawTitleScreen() {
+
+    textAlign(CENTER, CENTER);
+
+    push();
+    // Title
+    fill('white');
+    textSize(48);
+    text('SpiderSpiderSpider', width / 2, height * 0.15);
+
+    // Draw start button
+    fill('white');
+    rectMode(CENTER);
+    rect(width / 2, height * 0.3, button.width, button.height);
+
+    // Button text
+    fill('black');
+    textSize(24);
+    text('Start', width / 2, height * 0.3);
+    textSize(10);
+    // Left side - Game Instructions
+    fill('white');
+
+    // Main objective
+
+    let leftX = 150;
+    let rightX = width - 150;
+    let startY = height * 0.6;
+    let lineSpacing = 25;
+
+    textSize(18);
+    textStyle(BOLD);
+    text('HOW TO PLAY:', leftX, height * 0.5);
+
+    // Game rules
+    textStyle(NORMAL);
+    textSize(14);
+
+    text('1. Catch bugs to grow bigger', leftX, startY);
+    text('2. Collect power tokens to extend your web', leftX, startY + lineSpacing);
+    text('3. Grow twice as big as your opponent', leftX, startY + lineSpacing * 2);
+    text('4. Use your web to catch them!', leftX, startY + lineSpacing * 3);
+
+    textSize(12);
+    textStyle(ITALIC);
+    text('Warning: Running out of tokens means defeat!', leftX, startY + lineSpacing * 4);
+
+    // Right side - Controls
+    textStyle(BOLD);
+    textSize(18);
+    text('CONTROLS:', rightX, height * 0.5);
+
+    textStyle(NORMAL);
+    textSize(14);
+    // Player 1 controls
+    push();
+    textStyle(BOLD);
+    text('Player 1 (Bottom Spider)', rightX, startY);
+    pop();
+    text('Left/Right to move - Up to shoot', rightX, startY + lineSpacing);
+
+    // Player 2 controls
+    push();
+    textStyle(BOLD);
+    text('Player 2 (Top Spider)', rightX, startY + lineSpacing * 3);
+    pop();
+    text('A/D keys to move - S to shoot', rightX, startY + lineSpacing * 4);
+
+    pop();
+}
+
+function drawGameWonScreen() {
+    push();
+    // Display win
+    textAlign(CENTER, CENTER);
+    fill('white');
+    textStyle(BOLD);
+    textSize(24);
+    text(winReason, width / 2, height / 2 - 40);
+
+    // Draw restart button
+    fill('white');
+    rectMode(CENTER);
+    rect(width / 2, height / 2 + 40, button.width, button.height);
+
+    // Button text
+    fill('black');
+    textSize(24);
+    text('Play Again', width / 2, height / 2 + 40);
+}
+
+
+function resetGame() {
+    // Reset players
+    player1.body.growthAmount = 0;
+    player2.body.growthAmount = 0;
+    player1.body.rotation = 0;
+    player2.body.rotation = 0;
+    player1.web.state = "idle";
+    player2.web.state = "idle";
+
+    // Reset tokens back to original starting value
+    player1Tokens = 2;
+    player2Tokens = 2;
+
+    // Clear arrays
+    bugs = [];
+    powerTokens = [];
+
+    // Erase game won data
+    gameWonInitialized = false;
+    winReason = '';
+
+    // Add initial bug and power token
+    bugs.push(createBug(5, 0.05));
+    powerTokens.push(createPowerToken());
+}
+
 
 function drawBorder() {
     push();
@@ -189,6 +305,18 @@ function drawBorder() {
 }
 
 function keyPressed() {
+
+    //Spacebar to change states
+    if (keyCode === 32) {
+        if (gameState === gameTitle) {
+            resetGame();
+            gameState = gamePlaying;
+        }
+        else if (gameState === gameWon) {
+            resetGame();
+            gameState = gamePlaying;
+        }
+    }
     //Left and right
     if (keyCode === LEFT_ARROW) {
         move.leftKeyActive = true;
@@ -543,7 +671,8 @@ function checkAllWebBugOverlaps() {
                 player1Tokens -= tokenCost;
 
                 if (player1Tokens <= 0) {
-                    gameState = GAME_OVER;
+                    gameState = gameWon;
+                    winReason = 'PLAYER 2 WINS! - Player 1 ran out of tokens!';
                     return;
                 }
 
@@ -564,7 +693,8 @@ function checkAllWebBugOverlaps() {
                 player2Tokens -= tokenCost;
 
                 if (player2Tokens <= 0) {
-                    gameState = GAME_OVER;
+                    gameState = gameWon;
+                    winReason = 'PLAYER 1 WINS! - Player 2 ran out of tokens!';
                     return;
                 }
 
@@ -585,6 +715,7 @@ function checkWinCondition() {
             let distanceToPlayer2 = dist(player1.web.x, player1.web.y, player2.body.x, player2.body.y);
             if (distanceToPlayer2 < (player1.web.tipSize + player2.body.size) / 2) {
                 gameState = gameWon;
+                winReason = 'PLAYER 1 WINS! - Player 2 was Eaten!';
             }
         }
     }
@@ -596,6 +727,7 @@ function checkWinCondition() {
             let distanceToPlayer1 = dist(player2.web.x, player2.web.y, player1.body.x, player1.body.y);
             if (distanceToPlayer1 < (player2.web.tipSize + player1.body.size) / 2) {
                 gameState = gameWon;
+                winReason = 'PLAYER 2 WINS! - Player 1 was Eaten!';
             }
         }
     }
