@@ -58,7 +58,7 @@ let powerTokens = [];
 
 // Time variables for bug spawn
 let lastSpawnTime = 0;
-const spawnInterval = 5000 //5 seconds
+const spawnInterval = 3000 //5 seconds
 
 // Variables for size counter
 let player1Size = 0;
@@ -816,11 +816,11 @@ function checkWinCondition() {
     // Check if player1 meets win conditions
     //Special condition for zero, because 0x0 is also zero, if one is zero the other must have eaten one token
     if ((player2.body.growthAmount === 0 && player1.body.growthAmount >= 10) ||
-    //Checks if opponent is half your size
+        //Checks if opponent is half your size
         (player2.body.growthAmount > 0 && player1.body.growthAmount >= player2.body.growthAmount * 2)) {
-       //haved enough tokens to win
-            if (player1Tokens >= winTokens) {
-                //Actually touching the opponent, change state to win.
+        //haved enough tokens to win
+        if (player1Tokens >= winTokens) {
+            //Actually touching the opponent, change state to win.
             let distanceToPlayer2 = dist(player1.web.x, player1.web.y, player2.body.x, player2.body.y);
             if (distanceToPlayer2 < (player1.web.tipSize + player2.body.size) / 2) {
                 gameState = gameWon;
