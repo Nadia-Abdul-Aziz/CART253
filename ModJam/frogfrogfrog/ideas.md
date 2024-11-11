@@ -26,7 +26,7 @@ Mechanics:
         - A & D keys for rotation
         - W key to shoot tongue
 
-- pick up power tokens
+- pick up power tokens (DONE)
     - drop down from top/bottom & sides, linear movement, 360 degrees, random spawn along border
     - diffent color as fly, yellow?
     - water? sun? 
@@ -36,7 +36,7 @@ Mechanics:
     - players begin with 2 power each
     POTENTIAL PROBLEM!!! Randomly generates near the same frog more than once at the beginning of the game when they are unable to reach very far = unfair advantage to player
 
-- power tongue
+- power tongue (DONE)
     - number of power tokens (see below) caught dictates how far the tongue can go
     - fly can only come as close to the frog as the length given by 1 power token (minimum of 1 token needed to catch fly)
     - Once fly is caught, number of power tokens corresponding to the distance from the frog to the fly is used and reduces from the counter.
@@ -54,13 +54,13 @@ Mechanics:
     - limit of 3 ??? CHANGED TO NO LIMIT
     - noise()
 
-- Requirements to eat opponent
+- Requirements to eat opponent (DONE)
     - must have adequate power tokens and size 
         - (see trigger win state)
     - size requirement - triple the size of opponent (any size)
     - power requirement - must be able to reach frog = maximum storage
 
-- title screen & ending screen
+- title screen & ending screen (DONE)
     - title screen (state)
         - title declaration text or animation
         - Space bar to start game 

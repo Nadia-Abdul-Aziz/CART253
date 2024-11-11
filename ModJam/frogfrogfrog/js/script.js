@@ -181,7 +181,7 @@ function draw() {
             drawPlayer2();
             moveSpider();
             moveWeb();
-            displaySize();
+            displayStats();
             managePowerTokens();
             checkWebPowerTokenCollisions();
             checkAllWebBugOverlaps();
@@ -193,8 +193,9 @@ function draw() {
     }
 }
 
+//Instructions and initial screen
+//All internal push/pops removed due to redundancy and confusion due to the amount of them.
 function drawTitleScreen() {
-
     textAlign(CENTER, CENTER);
 
     push();
@@ -203,7 +204,7 @@ function drawTitleScreen() {
     textSize(48);
     text('SpiderSpiderSpider', width / 2, height * 0.15);
 
-    // Draw start button
+    // Draw the start button square
     fill('white');
     rectMode(CENTER);
     rect(width / 2, height * 0.3, button.width, button.height);
@@ -212,20 +213,21 @@ function drawTitleScreen() {
     fill('black');
     textSize(24);
     text('Start', width / 2, height * 0.3);
+
+    //Sub-text
     fill('white');
     textSize(12);
     text('[SPACEBAR]', width / 2, height * 0.4);
-    textSize(10);
-    // Left side - Game Instructions
-    fill('white');
 
-    // Main objective
-
+    //Margins and padding variables because formatting is hard
+    //Tried turning this into an object but it was giving me issues for some reason, so they live here now
     let leftX = 150;
     let rightX = width - 150;
     let startY = height * 0.6;
     let lineSpacing = 25;
 
+    // Left side -  Instructions
+    fill('white');
     textSize(18);
     textStyle(BOLD);
     text('HOW TO WIN:', leftX, height * 0.5);
@@ -233,13 +235,13 @@ function drawTitleScreen() {
     // Game rules
     textStyle(NORMAL);
     textSize(14);
-
     text('1. Collect power tokens to extend your web!', leftX, startY);
     text('2. Eat bugs to grow bigger!', leftX, startY + lineSpacing);
     text('3. Catching farther bugs will use more power!', leftX, startY + lineSpacing * 2);
     text('4. Grow twice as big as your opponent!', leftX, startY + lineSpacing * 3);
     text('5. Devour your opponent with your web!', leftX, startY + lineSpacing * 4);
 
+    //Fine print
     textSize(12);
     textStyle(ITALIC);
     text('Warning: Running out of tokens means defeat!', width / 2, startY + lineSpacing * 7);
@@ -249,35 +251,36 @@ function drawTitleScreen() {
     textSize(18);
     text('CONTROLS:', rightX, height * 0.5);
 
-    textStyle(NORMAL);
+    //Player 1 controls
     textSize(14);
-    // Player 1 controls
-    push();
     textStyle(BOLD);
     text('Player 1 (Bottom Spider)', rightX, startY);
-    pop();
+    textStyle(NORMAL);
     text('Left/Right to move - Up to shoot', rightX, startY + lineSpacing);
 
     // Player 2 controls
-    push();
     textStyle(BOLD);
     text('Player 2 (Top Spider)', rightX, startY + lineSpacing * 3);
-    pop();
     text('A/D keys to move - S to shoot', rightX, startY + lineSpacing * 4);
 
     pop();
 }
 
+//Screen that opens when a win condition is met, gives the option to play again.
+//Again, all internal push/pops removed
 function drawGameWonScreen() {
-    push();
-    // Display win
     textAlign(CENTER, CENTER);
+
+    push();
+
+    // Display win
     fill('white');
     textStyle(BOLD);
     textSize(24);
+    //Shows specific reasoning for win/loss
     text(winReason, width / 2, height / 2 - 40);
 
-    // Draw restart button
+    // restart button
     fill('white');
     rectMode(CENTER);
     rect(width / 2, height / 2 + 40, button.width, button.height);
@@ -285,12 +288,14 @@ function drawGameWonScreen() {
     // Button text
     fill('black');
     textSize(14);
-    text('Play Again', width / 2, height / 2 + 40);
+    text('Restart', width / 2, height / 2 + 40);
+
     pop();
 }
 
-
+//Runs when the player starts the game for the second time
 function resetGame() {
+
     // Reset players
     player1.body.growthAmount = 0;
     player2.body.growthAmount = 0;
@@ -299,7 +304,7 @@ function resetGame() {
     player1.web.state = "idle";
     player2.web.state = "idle";
 
-    // Reset tokens back to original starting value
+    // Reset tokens back to original value
     player1Tokens = 2;
     player2Tokens = 2;
 
@@ -307,27 +312,28 @@ function resetGame() {
     bugs = [];
     powerTokens = [];
 
-    // Erase game won data
+    // Erase game won data, not sure if it's necessary but...just in case.
     winReason = '';
 
-    // Add initial bug and power token
+    // Adds initial bug and power token to the canvas when the game starts
     bugs.push(createBug(5, 0.05));
     powerTokens.push(createPowerToken());
 }
 
-
+//Just a cool little border for the canvas, nothing more
 function drawBorder() {
     push();
     noFill();
-    stroke(255);
+    stroke('white');
     strokeWeight(5);
     rect(0, 0, width, height);
     pop();
 }
 
+//Deals with the keyboard and player input
 function keyPressed() {
 
-    //Spacebar to change states
+    //Spacebar to change states (Title - playing, Won - playing)
     if (keyCode === 32) {
         if (gameState === gameTitle) {
             resetGame();
@@ -338,38 +344,43 @@ function keyPressed() {
             gameState = gamePlaying;
         }
     }
-    //Left and right
+
+    //Rotation controls for Player 1, left & right arrow
     if (keyCode === LEFT_ARROW) {
         move.leftKeyActive = true;
     }
     else if (keyCode === RIGHT_ARROW) {
         move.rightKeyActive = true;
     }
-    //WASD, separate from previous statement because can be triggered together, alternatively could have been a switch statement
+    //Rotation controls for Player 2, A & D
     if (keyCode === 68) {  // D key
         move.aKeyActive = true;
     }
     else if (keyCode === 65) {  // A key
         move.dKeyActive = true;
     }
-    //Web of player 1 move
+
+    //Web controls of Player 1, up arrow
     if (keyCode === UP_ARROW) {
         if (player1.web.state === "idle" && player1Tokens > 0) {
             player1.web.state = "outbound";
-            player1.web.distance = 0;
+            player1.web.distance = 0; //for now, see Move Web for token influence on the web
         }
     }
-
+    //Web controls for player 2, S key
     if (keyCode === 83) { // S key
         if (player2.web.state === "idle" && player2Tokens > 0) {
             player2.web.state = "outbound";
             player2.web.distance = 0;
         }
     }
-
 }
 
+//User input when they let go of the keys, rotation stops
+//Web inbound is not dependent on user input!! That is not in this function.
 function keyReleased() {
+
+    //Player 1
     if (keyCode === LEFT_ARROW) {
         move.leftKeyActive = false;
     }
@@ -377,6 +388,7 @@ function keyReleased() {
         move.rightKeyActive = false;
     }
 
+    //Player 2
     if (keyCode === 68) {  // D key
         move.aKeyActive = false;
     }
@@ -385,8 +397,11 @@ function keyReleased() {
     }
 }
 
-//Spider rotates by 1 pixel when the arrows are pressed, constrained to a maximum of 30 pixels on either side
+//Rotation mechanism
+//Spider rotates by 1 pixel when the arrows are pressed, constrained to a maximum of 40 pixels on either side
 function moveSpider() {
+
+    //Player 1
     if (move.leftKeyActive) {
         player1.body.rotation = constrain(player1.body.rotation - 1, -40, 40);
     }
@@ -394,6 +409,7 @@ function moveSpider() {
         player1.body.rotation = constrain(player1.body.rotation + 1, -40, 40);
     }
 
+    //Player 2
     if (move.aKeyActive) {
         player2.body.rotation = constrain(player2.body.rotation - 1, -40, 40);
     }
@@ -403,17 +419,19 @@ function moveSpider() {
 }
 
 // creating token properties
+//So I've discovered that I don't need external variables and this is so much faster for returns.
 function createPowerToken() {
     return {
         x: 0,
-        y: random(50, 430), // generation bounds, minimum distance of 1 token (50px)
+        y: random(50, 430), // generation limits, minimum distance of 1 token (50px) needed to well...catch tokens...don't run out.
         size: 15,
         speed: 7,
-        value: 1 // power tokens given when collected
+        value: 1 // power tokens given when collected, updates counter
     };
 }
 
 // Drawing the power token, appearance
+//For...of loop adds the tokens to the array
 function drawPowerTokens() {
     for (let token of powerTokens) {
         push();
@@ -423,52 +441,68 @@ function drawPowerTokens() {
         fill("black");
         textSize(10);
         textAlign(CENTER, CENTER);
-        text("+", token.x, token.y); //Plus symbol in the middle
+        text("+", token.x, token.y); //Plus symbol in the middle, for funsies
         pop();
     }
 }
 
+//Divides distance traveled by the spider's web by 50 (50 pixels = 1 token), uses math.ceil to round up and returns the amount of tokens used, reduces from counter
 function calculateTokenCost(distance) {
-    return Math.ceil(distance / 50);
+    return Math.ceil(distance / 50); //Math function I discovered, it works??
 }
 
 // power token spawn logic
 // Checked a few tutorials because this was hard
 function managePowerTokens() {
 
+    // Loop through the array backwards to remove elements
     for (let i = powerTokens.length - 1; i >= 0; i--) {
         let token = powerTokens[i];
+
+        //Move the token
         token.x += token.speed;
+
         //Generate new token once initial one reaches half the canvas
         if (token.x >= width / 2 && powerTokens.length === 1) {
             powerTokens.push(createPowerToken());
         }
-        // generate new one if the token reaches the end of the canvas
+
+        // remove tokens off screen
         if (token.x > width) {
             powerTokens.splice(i, 1);
         }
     }
+    //If all tokens on screen are somehow eaten, push a new one into the array
     if (powerTokens.length === 0) {
         powerTokens.push(createPowerToken());
     }
 }
 
-// Check web collision with all mines
+// Checks if the spider's web touched the power tokens
+// Used some tutorials again
 function checkWebPowerTokenCollisions() {
+
+    //Removing items
     for (let i = powerTokens.length - 1; i >= 0; i--) {
+        //Getting current token to check
         let token = powerTokens[i];
 
         // Check collision with player 1's web
+        //Finding the distance between the two points
         const distance1 = dist(player1.web.x, player1.web.y, token.x, token.y);
+        //collision detected if the distance is half of the sum of the two 
         if (distance1 < (player1.web.tipSize + token.size) / 2) {
+            //Increase player tokens
             player1Tokens = Math.min(maxTokens, player1Tokens + token.value);
+            //removing collected token from screen
             powerTokens.splice(i, 1);
+            //resetting web to come back to the spider
             player1.web.state = "inbound";
             continue;
 
         }
 
-        // Check collision with player 2's web
+        // Check collision with player 2's web, same thing
         const distance2 = dist(player2.web.x, player2.web.y, token.x, token.y);
         if (distance2 < (player2.web.tipSize + token.size) / 2) {
             player2Tokens = Math.min(maxTokens, player2Tokens + token.value);
@@ -479,26 +513,31 @@ function checkWebPowerTokenCollisions() {
 }
 
 
-
+//Visually drawing each player's spider
 function drawPlayer1() {
+
+    //Web string
     push();
     stroke("white");
     strokeWeight(player1.web.size);
     line(player1.web.x, player1.web.y, player1.body.x, player1.body.y);
     pop();
 
+    //Web tip
     imageMode(CENTER);
     image(webImg, player1.web.x, player1.web.y, player1.web.tipSize, player1.web.tipSize);
 
+    //Spider body
     push();
     imageMode(CENTER);
     translate(player1.body.x, player1.body.y);
-    rotate(180);
-    rotate(player1.body.rotation);
+    rotate(180); //Rotating the phyisical image permanently 
+    rotate(player1.body.rotation); //Related to user input, gameplay rotation
     image(houstonImg, 0, 0, player1.body.size + player1.body.growthAmount * 3, player1.body.size + player1.body.growthAmount * 3);
     pop();
 }
 
+//Same as player 1
 function drawPlayer2() {
     push();
     stroke("white");
@@ -516,12 +555,15 @@ function drawPlayer2() {
     push();
     imageMode(CENTER);
     translate(player2.body.x, player2.body.y);
-    rotate(player2.body.rotation);  // Apply the rotation
+    rotate(player2.body.rotation);
     image(houstonImg, 0, 0, player2.body.size + player2.body.growthAmount * 3, player2.body.size + player2.body.growthAmount * 3);
     pop();
 }
 
-function displaySize() {
+//Size & token counter to view how big you or your opponent are
+function displayStats() {
+
+    //PLayer 1 counters
     push();
     fill('yellow');
     textSize(16);
@@ -531,6 +573,7 @@ function displaySize() {
     text('Size: ' + player1.body.growthAmount, 590, 460);
     pop();
 
+    //Player 2 counters
     push();
     fill('yellow');
     textSize(16);
@@ -541,19 +584,25 @@ function displaySize() {
     pop();
 }
 
+//Anything and everything to do with the movement of the web for both player
 function moveWeb() {
     // Player 1 Web Logic
+    // State 1: Idle
+    // When web is not being shot, it stays behind the player's body
     if (player1.web.state === "idle") {
         // Reset web position and distance when idle
         player1.web.x = player1.body.x;
         player1.web.y = player1.body.y;
         player1.web.distance = 0;
     }
+    // State 2: outbound
     else if (player1.web.state === "outbound") {
+
         // Calculate max allowed distance based on tokens
-        const maxDistance = player1Tokens * 50; // Each token allows 50 pixels
+        const maxDistance = player1Tokens * 50; // Each token adds 50 pixels to web range
 
         // Update web position
+        //calculating the angle with trig
         player1.web.distance += player1.web.speed;
         let angle = -player1.body.rotation - 180;
         player1.web.x = player1.body.x + player1.web.distance * sin(angle);
@@ -562,7 +611,7 @@ function moveWeb() {
         // Store the maximum distance reached for token cost calculation
         player1.web.maxDistance = player1.web.distance;
 
-        // Check for maximum distance or border collision
+        // Check for maximum distance or border collision, convert to inbound
         if (player1.web.distance >= maxDistance ||
             player1.web.y <= 0 ||
             player1.web.x <= 0 ||
@@ -570,14 +619,17 @@ function moveWeb() {
             player1.web.state = "inbound";
         }
     }
+
+    //state 3: inbound
     else if (player1.web.state === "inbound") {
         // Retract web
+        //calculate angle again
         player1.web.distance -= player1.web.speed;
         let angle = -player1.body.rotation - 180;
         player1.web.x = player1.body.x + player1.web.distance * sin(angle);
         player1.web.y = player1.body.y + player1.web.distance * cos(angle);
 
-        // Reset when fully retracted
+        // Reset to idle when fully retracted
         if (player1.web.distance <= 0) {
             player1.web.state = "idle";
             player1.web.x = player1.body.x;
@@ -586,26 +638,24 @@ function moveWeb() {
         }
     }
 
-    // Player 2 Web Logic
+    // Player 2 Web Logic, almost the same as player 1, with minor differences
     if (player2.web.state === "idle") {
         player2.web.x = player2.body.x;
         player2.web.y = player2.body.y;
         player2.web.distance = 0;
     }
     else if (player2.web.state === "outbound") {
-        // Calculate max allowed distance based on tokens
         const maxDistance = player2Tokens * 50;
 
-        // Update web position
         player2.web.distance += player2.web.speed;
         let angle = -player2.body.rotation;
         player2.web.x = player2.body.x + player2.web.distance * sin(angle);
         player2.web.y = player2.body.y + player2.web.distance * cos(angle);
 
-        // Store the maximum distance reached for token cost calculation
+
         player2.web.maxDistance = player2.web.distance;
 
-        // Check for maximum distance or border collision
+
         if (player2.web.distance >= maxDistance ||
             player2.web.y >= height ||
             player2.web.x <= 0 ||
@@ -614,13 +664,13 @@ function moveWeb() {
         }
     }
     else if (player2.web.state === "inbound") {
-        // Retract web
+
         player2.web.distance -= player2.web.speed;
         let angle = -player2.body.rotation;
         player2.web.x = player2.body.x + player2.web.distance * sin(angle);
         player2.web.y = player2.body.y + player2.web.distance * cos(angle);
 
-        // Reset when fully retracted
+
         if (player2.web.distance <= 0) {
             player2.web.state = "idle";
             player2.web.x = player2.body.x;
@@ -630,77 +680,111 @@ function moveWeb() {
     }
 }
 
+//Creating new bugs every 5 seconds
+//Overcomplicated, could have just used setInterval from time events...
 function newSpawn() {
     // Constraining to max 10 bugs
+    //Generate new bug if previous spawn was 5 seconds or more prior
     if (bugs.length < 5 && millis() - lastSpawnTime >= spawnInterval) {
+
+        //Randomizing
         const newSpeed = random(5, 8);
         const newDirectionChance = random(0.05, 0.1);
+        //Push new bug to the array
         bugs.push(createBug(newSpeed, newDirectionChance));
+        //Updating spawn time 
         lastSpawnTime = millis();
     }
 }
 
+//Iterating through bugs array to draw/move the bugs
 function drawBug() {
-
     for (let bug of bugs) {
         moveSingleBug(bug);
         drawSingleBug(bug);
     }
 }
 
+//Responsible for updating the properties of a single bug, speed, direction and collisions
+//Initially attempted with noise() but did not produce desired results. 
 function moveSingleBug(bug) {
+
+    //Setting angle range that the bug can randomly change direction to if random value is less than changeDirectionChance
     if (random() < bug.changeDirectionChance) {
         bug.moveAngle += random(-60, 60);
     }
 
-    /// I don't know anymore with this trig stuff, I just look at documentation and assume it'll work, I wrote it a while ago and I don't actually know what this does, it does something. 
+    //Updating position using trig to update its x and y 
+    // I don't know anymore with this trig stuff, I just look at documentation and assume it'll work, I wrote it a while ago and I don't actually know what this does, it does something. 
     bug.x += cos(bug.moveAngle) * bug.speed;
     bug.y += sin(bug.moveAngle) * bug.speed;
 
     // Wall collisions
+    // If the bug's x is less than 0 (left wall), set X to 0 and reverse the direction
     if (bug.x < 0) {
         bug.x = 0;
         bug.moveAngle = -bug.moveAngle + 180;
     }
+    //if greater than canvas width, reverse
     else if (bug.x > width - bug.size) {
         bug.x = width - bug.size;
         bug.moveAngle = -bug.moveAngle + 180;
     }
-
+    // y is less than 0 (top wall), reverse
     if (bug.y < 0) {
         bug.y = 0;
         bug.moveAngle = -bug.moveAngle;
     }
+    //greater than canvas height, reverse
     else if (bug.y > height - bug.size) {
         bug.y = height - bug.size;
         bug.moveAngle = -bug.moveAngle;
     }
 }
 
+//Visually drawing the bug, inserting image
 function drawSingleBug(bug) {
     image(bugImg, bug.x, bug.y, bug.size, bug.size);
 }
 
+// Verifying that a bug was caught
 function checkAllWebBugOverlaps() {
     for (let bug of bugs) {
+        //check if Player 1's web is not idle
         if (player1.web.state !== "idle") {
+            // Calculate the distance between the bug and Player 1's web
             const d1 = dist(player1.web.x, player1.web.y, bug.x, bug.y);
+
+            // Determine if the bug is caught by web, distance less than half the sum of the web size and the bug size
             const caught1 = (d1 < player1.web.size / 2 + bug.size / 2);
 
+            // If the bug is caught
             if (caught1) {
+                // Calculate the token cost based on the distance traveled 
                 const tokenCost = calculateTokenCost(player1.web.distance);
+
+                // Subtract the token cost from counter
                 player1Tokens -= tokenCost;
 
+                // If run out of tokens, the game is over and the other player wins
                 if (player1Tokens <= 0) {
                     gameState = gameWon;
+                    //Text to display on game won screen
                     winReason = 'PLAYER 2 WINS! Player 1 ran out of power...';
                     return;
                 }
 
+                // Remove the caught bug from the array
                 bugs.splice(bugs.indexOf(bug), 1);
+
+                // Set web state to retract back to idle
                 player1.web.state = "inbound";
+
+                // Increase the player's body growth amount (for counter) and size (visible growth)
                 player1.body.growthAmount += 10;
                 player1Size += 1;
+
+                // Skip checking Player 2's web since this bug has already been caught
                 continue;
             }
         }
@@ -727,15 +811,20 @@ function checkAllWebBugOverlaps() {
         }
     }
 }
-
+//function to check all conditions under which an opponent has been devoured.
 function checkWinCondition() {
     // Check if player1 meets win conditions
+    //Special condition for zero, because 0x0 is also zero, if one is zero the other must have eaten one token
     if ((player2.body.growthAmount === 0 && player1.body.growthAmount >= 10) ||
+    //Checks if opponent is half your size
         (player2.body.growthAmount > 0 && player1.body.growthAmount >= player2.body.growthAmount * 2)) {
-        if (player1Tokens >= winTokens) {
+       //haved enough tokens to win
+            if (player1Tokens >= winTokens) {
+                //Actually touching the opponent, change state to win.
             let distanceToPlayer2 = dist(player1.web.x, player1.web.y, player2.body.x, player2.body.y);
             if (distanceToPlayer2 < (player1.web.tipSize + player2.body.size) / 2) {
                 gameState = gameWon;
+                //text displayed
                 winReason = 'PLAYER 1 WINS! PLAYER 2 WAS DEVOURED!';
             }
         }

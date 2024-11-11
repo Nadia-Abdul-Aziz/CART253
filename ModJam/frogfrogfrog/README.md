@@ -1,12 +1,19 @@
-# Frogfrogfrog
+# SPiderSpiderSpider
+Nadia AbdulAziz
 
-A game created with my website being built for CART211 in mind
-[Play it!](https://pippinbarr.github.io/cart253-examples/topics/making/frogfrogfrog/index.html)
+## [View the project online]()
 
+## Description
+This is a multiplayer spider game where you can collect tokens to grow and eat your friend! Use the keyboard to rotate and launch your web to eat tokens and bugs, and eventually reach your opponent!
 
-Notice: UNKNOWN BUG - Player 2 collects flies automatically without deploying web. 
+## Credits
+This project uses [p5.js](https://p5js.org).
 
-- [Ideas](./ideas.md)
-- [Planning](./planning.md)
-- [Pseudocode](./pseudocode.md)
+Various unspecified web tutorials and documentation (Stack overflow, w3schools, p5 documentation, etc.)
+
+Pippin Barr class material for CART253 (https://pippinbarr.com/cart253/)
+## Attribution
+The bug and spider images were sourced from pngtree (https://pngtree.com/)
+
+- [Idea & Plan](./ideas.md)
 
