@@ -212,12 +212,12 @@ function drawTitleScreen() {
     // Button text
     fill('black');
     textSize(24);
-    text('Start', width / 2, height * 0.3);
+    text('Start', width / 2, height * 0.295); //Trying numbers until it worked nicely
 
     //Sub-text
-    fill('white');
-    textSize(12);
-    text('[SPACEBAR]', width / 2, height * 0.4);
+    fill('black');
+    textSize(7);
+    text('[SPACEBAR]', width / 2, height * 0.325);
 
     //Margins and padding variables because formatting is hard
     //Tried turning this into an object but it was giving me issues for some reason, so they live here now
