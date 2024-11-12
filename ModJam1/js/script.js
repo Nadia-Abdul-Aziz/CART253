@@ -36,7 +36,7 @@ let bugImg
 function preload() {
     houstonImg = loadImage('assets/images/homeIcon.png');
     webImg = loadImage('assets/images/webShoot.png');
-    bugImg = loadImage('assets/images/bug.png');
+    bugImg = loadImage('assets/images/Bug.png');
 }
 
 //Game States
