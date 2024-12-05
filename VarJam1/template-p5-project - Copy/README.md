@@ -18,6 +18,8 @@ List of tutorials:
 
 Getting the damn buttons onto the canvas: https://www.youtube.com/watch?v=7_jNZLu_6H8
 
+Collisions: https://www.youtube.com/watch?v=HK_oG_ev8FQ
+
 
 
 

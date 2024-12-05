@@ -1,14 +1,4 @@
-//All image variables
 let titleImage;
-
-//Game states 
-const gameStates = {
-    title: 'title',
-    clockAttack: 'clockAttack',
-    drowning: 'drowning',
-    pippinBarr: 'pippinBarr',
-    roulette: 'roulette'
-};
 
 //Assigning the states to the game text in the title screen
 const gameMenu = {
@@ -37,8 +27,6 @@ const gameMenu = {
 //Current state
 let currentGameState = gameStates.title;
 
-//Objects
-
 function preload() {
     titleImage = loadImage('assets/images/Pic1.jpg');
 }
@@ -46,9 +34,15 @@ function preload() {
 function setup() {
     createCanvas(600, 400)
     background(255);
-    //Else this will generate a thousand times, needs to be here
+
+    // Create buttons only on title screen
     if (currentGameState === gameStates.title) {
         createButtons();
+    }
+
+    // Setup individual game states
+    if (currentGameState === gameStates.clockAttack) {
+        clockAttackSetup();
     }
 }
 
@@ -61,7 +55,7 @@ function draw() {
             drawTitle();
             break;
         case gameStates.clockAttack:
-            drawClockAttack();
+
             break;
         case gameStates.drowning:
             drawDrowning();
@@ -76,7 +70,6 @@ function draw() {
 }
 
 function drawBorder() {
-    //not worth making an object
     push();
     stroke(255, 0, 0);
     strokeWeight(4);
@@ -85,12 +78,7 @@ function drawBorder() {
     pop();
 }
 
-
-
-//ALL TITLE SCREEN FUNCTIONS
-
 function drawRect() {
-    //not worth making an object
     push();
     fill('black');
     rect(400, 325, 500, 80);
@@ -106,38 +94,37 @@ function drawTitle() {
 
     push();
     textSize(15);
-    text('Choose your fight', 480, 80);
-    text('against wakefulness', 470, 100);
+    text('Choose your fight', 455, 80);
+    text('against wakefulness', 440, 100);
     pop();
 }
 
 function createButtons() {
-    //I discovered that there's a function for buttons and I am thrilled that I don't need a massive if statement.
     let buttonClock = createButton('Clock Attack');
     buttonClock.position(850, 250);
     buttonClock.size(100, 30);
-    buttonClock.mousePressed(function () {
+    buttonClock.mousePressed(() => {
         currentGameState = gameStates.clockAttack;
     });
 
     let buttonDrowning = createButton('Drown');
     buttonDrowning.position(850, 300);
     buttonDrowning.size(100, 30);
-    buttonDrowning.mousePressed(function () {
+    buttonDrowning.mousePressed(() => {
         currentGameState = gameStates.drowning;
     });
 
     let buttonPippin = createButton('The Professor');
     buttonPippin.position(850, 350);
     buttonPippin.size(100, 30);
-    buttonPippin.mousePressed(function () {
+    buttonPippin.mousePressed(() => {
         currentGameState = gameStates.pippinBarr;
     });
 
     let buttonRoulette = createButton('Bed Roulette');
     buttonRoulette.position(850, 400);
     buttonRoulette.size(100, 30);
-    buttonRoulette.mousePressed(function () {
+    buttonRoulette.mousePressed(() => {
         currentGameState = gameStates.roulette;
     });
 }
