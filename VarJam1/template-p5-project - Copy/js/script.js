@@ -1,29 +1,5 @@
 let titleImage;
 
-//Assigning the states to the game text in the title screen
-const gameMenu = {
-    clockAttack: {
-        name: 'Clock Attack',
-        state: gameStates.clockAttack,
-        y: 150
-    },
-    drowning: {
-        name: 'Drowning in my Tears',
-        state: gameStates.drowning,
-        y: 200
-    },
-    pippinBarr: {
-        name: 'The Professor',
-        state: gameStates.pippinBarr,
-        y: 250
-    },
-    roulette: {
-        name: 'Russian Roulette',
-        state: gameStates.roulette,
-        y: 300
-    }
-};
-
 //Current state
 let currentGameState = gameStates.title;
 
@@ -34,39 +10,13 @@ function preload() {
 function setup() {
     createCanvas(600, 400)
     background(255);
-
-    // Create buttons only on title screen
-    if (currentGameState === gameStates.title) {
-        createButtons();
-    }
-
-    // Setup individual game states
-    if (currentGameState === gameStates.clockAttack) {
-        clockAttackSetup();
-    }
 }
 
 function draw() {
     drawBorder();
-    switch (currentGameState) {
-        case gameStates.title:
-            image(titleImage, 3, 3, 400, height);
-            drawRect();
-            drawTitle();
-            break;
-        case gameStates.clockAttack:
-
-            break;
-        case gameStates.drowning:
-            drawDrowning();
-            break;
-        case gameStates.pippinBarr:
-            drawPippinBarr();
-            break;
-        case gameStates.roulette:
-            drawRoulette();
-            break;
-    }
+    image(titleImage, 3, 3, 400, height);
+    drawRect();
+    drawTitle();
 }
 
 function drawBorder() {
@@ -99,32 +49,32 @@ function drawTitle() {
     pop();
 }
 
-function createButtons() {
-    let buttonClock = createButton('Clock Attack');
-    buttonClock.position(850, 250);
-    buttonClock.size(100, 30);
-    buttonClock.mousePressed(() => {
-        currentGameState = gameStates.clockAttack;
-    });
+// function createButtons() {
+//     let buttonClock = createButton('Clock Attack');
+//     buttonClock.position(850, 250);
+//     buttonClock.size(100, 30);
+//     buttonClock.mousePressed(() => {
+//         currentGameState = gameStates.clockAttack;
+//     });
 
-    let buttonDrowning = createButton('Drown');
-    buttonDrowning.position(850, 300);
-    buttonDrowning.size(100, 30);
-    buttonDrowning.mousePressed(() => {
-        currentGameState = gameStates.drowning;
-    });
+//     let buttonDrowning = createButton('Drown');
+//     buttonDrowning.position(850, 300);
+//     buttonDrowning.size(100, 30);
+//     buttonDrowning.mousePressed(() => {
+//         currentGameState = gameStates.drowning;
+//     });
 
-    let buttonPippin = createButton('The Professor');
-    buttonPippin.position(850, 350);
-    buttonPippin.size(100, 30);
-    buttonPippin.mousePressed(() => {
-        currentGameState = gameStates.pippinBarr;
-    });
+//     let buttonPippin = createButton('The Professor');
+//     buttonPippin.position(850, 350);
+//     buttonPippin.size(100, 30);
+//     buttonPippin.mousePressed(() => {
+//         currentGameState = gameStates.pippinBarr;
+//     });
 
-    let buttonRoulette = createButton('Bed Roulette');
-    buttonRoulette.position(850, 400);
-    buttonRoulette.size(100, 30);
-    buttonRoulette.mousePressed(() => {
-        currentGameState = gameStates.roulette;
-    });
-}
+//     let buttonRoulette = createButton('Bed Roulette');
+//     buttonRoulette.position(850, 400);
+//     buttonRoulette.size(100, 30);
+//     buttonRoulette.mousePressed(() => {
+//         currentGameState = gameStates.roulette;
+//     });
+// }
