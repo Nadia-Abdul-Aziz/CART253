@@ -4,6 +4,7 @@ let enemyImg;
 let bulletImg;
 let lossImg;
 let winImg;
+let professorImg;
 
 // Game states
 const titleScreen = 'title screen';
@@ -23,8 +24,8 @@ let gameWonInitialized = false;
 let player = {
     x: 320,
     y: 430,
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
     speed: 6,
     cooldown: 0,  // Cooldown timer between shots, not sure if this works really
     ySpeed: 0,
@@ -63,11 +64,11 @@ let enemyDirection = 1;   // Direction of movement (1 for right, -1 for left)
 //Load all images
 function preload() {
     playerImg = loadImage('assets/images/face.png');
-    enemyImg = loadImage('assets/images/clock.jpg');
+    enemyImg = loadImage('assets/images/clock.png');
     bulletImg = loadImage('assets/images/pillow.png');
     lossImg = loadImage('assets/images/loss.jpg');
     winImg = loadImage('assets/images/z.png')
-    professorImg = loadImage('assets/images/clown.png');
+    professorImg = loadImage('assets/images/professor.png');
 }
 
 
@@ -345,6 +346,7 @@ function keyPressed() {
         bullet.x = player.x + player.width / 2 - bullet.width / 2;
         bullet.y = player.y;
         // Set cooldown between shots
+        //reduced because it was too long
         player.cooldown = 15;
     }
 
@@ -356,7 +358,7 @@ function keyPressed() {
 
 // New function to update professor movement
 function updateProfessor() {
-    // Activate professor after a delay (similar to previous boss)
+    // Activate professor after a delay 
     if (frameCount > 50) { // Adjust this value to control when professor becomes active
         professor.active = true;
     }
@@ -390,12 +392,15 @@ function checkProfessorCollision() {
         return false; // Player is above professor, no collision
     }
 
-    // Reduce collision area by adding padding
+    let horizontalPadding = 20; // Consistent horizontal padding
+    let verticalPadding = player.isOnGround ? 20 : 30; // Slight variation in vertical padding
+
+    // Ensure more symmetric collision detection
     return (
-        player.x + 30 < professor.x + professor.width - 30 &&
-        player.x + player.width - 30 > professor.x + 30 &&
-        player.y + 30 < professor.y + professor.height - 30 &&
-        player.y + player.height - 30 > professor.y + 30
+        player.x + horizontalPadding < professor.x + professor.width - horizontalPadding &&
+        player.x + player.width - horizontalPadding > professor.x + horizontalPadding &&
+        player.y + verticalPadding < professor.y + professor.height - verticalPadding &&
+        player.y + player.height - verticalPadding > professor.y + verticalPadding
     );
 }
 

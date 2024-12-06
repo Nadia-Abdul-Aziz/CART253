@@ -57,7 +57,7 @@ let enemyDirection = 1;   // Direction of movement (1 for right, -1 for left)
 //Load all images
 function preload() {
     playerImg = loadImage('assets/images/face.png');
-    enemyImg = loadImage('assets/images/clock.jpg');
+    enemyImg = loadImage('assets/images/clock.png');
     bulletImg = loadImage('assets/images/pillow.png');
     lossImg = loadImage('assets/images/loss.jpg');
     winImg = loadImage('assets/images/z.png')
