@@ -2,7 +2,7 @@
 
 Nadia Abdul Aziz
 
-[View this project online](URL_FOR_THE_RUNNING_PROJECT)
+[View this project online](https://nadia-abdul-aziz.github.io/CART253/VarJam1/sleepInvaders/)
 
 ## Description
 
