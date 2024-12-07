@@ -4,7 +4,6 @@ let enemyImg;
 let bulletImg;
 let lossImg;
 let winImg;
-let professorImg;
 
 // Game states
 const titleScreen = 'title screen';
@@ -23,23 +22,11 @@ let gameWonInitialized = false;
 //Angry guy
 let player = {
     x: 320,
-    y: 500, // Lowered resting position
-    width: 120,
-    height: 120,
-    speed: 6,
-    cooldown: 0,  // Cooldown timer between shots, not sure if this works really
-    ySpeed: 0,
-    isOnGround: true
-};
-
-//The follower
-let professor = {
-    x: 50,
-    y: 460,
-    width: 50,
-    height: 50,
-    speed: 2,
-    active: false   // Initially doesn't move
+    y: 430,
+    width: 150,
+    height: 150,
+    speed: 5,
+    cooldown: 0  // Cooldown timer between shots, not sure if this works really
 };
 
 // the pillows
@@ -68,7 +55,6 @@ function preload() {
     bulletImg = loadImage('assets/images/pillow.png');
     lossImg = loadImage('assets/images/loss.jpg');
     winImg = loadImage('assets/images/z.png')
-    professorImg = loadImage('assets/images/professor.png');
 }
 
 
@@ -184,16 +170,24 @@ function drawTitleScreen() {
 
 //All gameplay functions
 function updateGame() {
+    //had a bug, fixed it but leaving this here in case I need it again.
+    // console.log(player.x);
+    // console.log(player.y);
+    // console.log(bullet.active);
+
+    //only draw if the state is playing, fixing bug to only draw during playing state issue
     if (gameState === gamePlaying) {
-        updatePlayer(); // Add this line to apply gravity and vertical movement
+
         drawPlayer();
+
         movePlayer();
+
         shootBullet();
+
         updateEnemy();
-        updateProfessor();
-        drawProfessor();
     }
-}
+
+};
 
 //Draws the image for the player
 function drawPlayer() {
@@ -210,7 +204,8 @@ function drawPlayer() {
 
 //Handles keyboard input to move the angry man
 function movePlayer() {
-    // Existing horizontal movement
+
+    //Moving when left and right key is pressed and constraining to canvas bounds
     if (keyIsDown(LEFT_ARROW) && player.x > 0) {
         player.x -= player.speed;
     }
@@ -218,26 +213,6 @@ function movePlayer() {
         player.x += player.speed;
     }
 
-    // Jump only when on ground
-    if (keyIsDown(UP_ARROW) && player.isOnGround) {
-        player.ySpeed = -11; // Negative value makes the player jump up
-        player.isOnGround = false;
-    }
-}
-
-function updatePlayer() {
-    // Apply gravity
-    player.ySpeed += 0.5; // Adjust this value to control gravity strength
-    player.y += player.ySpeed;
-
-    // Ground collision
-    if (player.y >= 450) { // Adjusted ground collision
-        player.y = 450; // Adjusted ground position
-        player.ySpeed = 0;
-        player.isOnGround = true;
-    } else {
-        player.isOnGround = false;
-    }
 }
 
 //Anything to do with flinging the pillows at the clocks
@@ -346,7 +321,6 @@ function keyPressed() {
         bullet.x = player.x + player.width / 2 - bullet.width / 2;
         bullet.y = player.y;
         // Set cooldown between shots
-        //reduced because it was too long
         player.cooldown = 15;
     }
 
@@ -354,58 +328,6 @@ function keyPressed() {
     if (keyCode === 32 && gameState === gameOver) {
         resetGame();
     }
-}
-
-// New function to update professor movement
-function updateProfessor() {
-    // Activate professor after a delay 
-    if (frameCount > 50) { // Adjust this value to control when professor becomes active
-        professor.active = true;
-    }
-
-    // Professor movement tracking player
-    if (professor.active) {
-        if (professor.x < player.x) {
-            professor.x += professor.speed;  // Move right towards player
-        } else if (professor.x > player.x) {
-            professor.x -= professor.speed;  // Move left towards player
-        }
-
-        // Check for collision with player
-        if (checkProfessorCollision()) {
-            gameState = gameOver;
-        }
-    }
-}
-
-// Function to draw professor
-function drawProfessor() {
-    if (professor.active) {
-        image(professorImg, professor.x, professor.y, professor.width, professor.height);
-    }
-}
-
-// Collision detection function for professor
-function checkProfessorCollision() {
-    // Only detect collision if player is not jumping above the professor
-    if (player.y + player.height < professor.y) {
-        return false; // Player is above professor, no collision
-    }
-
-    let padding = 20; // Consistent padding
-
-    //Slight issue with assymetry on the right side when colliding, 
-    return (
-        //Drawing this out on a piece of paper to fix the bug
-        //IVE BEEN AT THIS FOR AN HOUR
-        //if the player's x location (left) plus the padding is smaller than the professor's x location + the professor's width minus the padding (left collision)
-        //if the player's x location left + the player's width minus padding
-        //
-        player.x + padding < professor.x + professor.width - padding &&
-        player.x + player.width - padding > professor.x + padding &&
-        player.y + padding < professor.y + professor.height - padding &&
-        player.y + player.height - padding > professor.y + padding
-    );
 }
 
 function initializeGameOver() {
@@ -463,20 +385,15 @@ function resetGame() {
 
     // Reset player position and cooldown
     player.x = 320;
-    player.y = 420; // Adjusted reset position
+    player.y = 430;
     player.cooldown = 0;
-    player.width = 120; // Reset player width
-    player.height = 120; // Reset player height
+    player.width = 150; // Reset player width
+    player.height = 150; // Reset player height
 
     // Reset bullet
     bullet.active = false;
     bullet.width = 50; // Reset bullet width
     bullet.height = 50; // Reset bullet height
-
-    //reset professor
-    professor.x = 50;
-    professor.y = 460;
-    professor.active = false
 
     // Recreate enemy grid
     enemies = [];
@@ -510,7 +427,7 @@ function initializeGameWon() {
 
     // Display win
     fill('black');
-    textStyle
+    textStyle(BOLD);
     textSize(24);
     //Shows specific reasoning for win/loss
     text(gameWonText, width / 2, height / 2 - 90);
