@@ -3,15 +3,45 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
     <title>SLEEP INVADERS</title>
 
     <!-- CSS stylesheet(s) -->
     <link rel="stylesheet" type="text/css" href="css/style.css" />
 
-    <!-- Library script(s) -->
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
 
+        #homeLink {
+            position: absolute;
+            bottom: calc(50% - 7.5%);
+            left: 50%;
+            transform: translateX(-50%);
+            color: red;
+            text-decoration: none;
+            font-size: 15px;
+            font-family: sans-serif;
+            font-weight: bold;
+            display: none;
+            z-index: 10;
+        }
+
+        @media screen and (max-width: 640px) {
+            #homeLink {
+                font-size: 12px;
+            }
+        }
+    </style>
+
+    <!-- Library script(s) -->
     <!-- p5.min.js is the main p5 library -->
     <script src="js/libraries/p5.min.js"></script>
     <!-- p5.sound.min.js allows us to use sound -->
@@ -19,13 +49,10 @@
 
     <!-- My script(s) -->
     <script src="js/theProfessor.js"></script>
-
 </head>
 
 <body>
-    <a id="homeLink" href="index.html"
-        style="position: absolute; top: 400px; left: 600px; color: red; text-decoration: none; font-size: 14px; font-family: sans-serif; font-weight: bold; display: none;">___Click
-        to Snooze___</a>
+    <a id="homeLink" href="index.html">___Click to Snooze___</a>
 </body>
 
 </html>

@@ -715,7 +715,7 @@ function moveSingleBug(bug) {
     }
 
     //Updating position using trig to update its x and y 
-    // I don't know anymore with this trig stuff, I just look at documentation and assume it'll work, I wrote it a while ago and I don't actually know what this does, it does something. 
+    // I don't know anymore with this trig stuff, I just look at documentation and assume it'll work, I wrote it a while ago and I dons't actually know what this does, it does something. 
     bug.x += cos(bug.moveAngle) * bug.speed;
     bug.y += sin(bug.moveAngle) * bug.speed;
 

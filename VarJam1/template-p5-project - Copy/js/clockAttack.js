@@ -147,7 +147,7 @@ function drawTitleScreen() {
     text('CLOCK ATTACK', width / 2, height * 0.15);
 
     imageMode(CENTER);
-    image(enemyImg, width / 2, height * 0.32, 7, 70); // Adjust size as needed
+    image(enemyImg, width / 2, height * 0.32, 70, 70); // Adjust size as needed
 
     // Game rules
     textSize(18);
