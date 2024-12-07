@@ -1,17 +1,31 @@
+
+/**
+ * Sleep Invaders
+ * 
+ * Nadia Abdul Aziz
+ * 
+ * The title screen for a series of games based on the classic space invaders.
+ * Click to select the desired game (stored in seperate html files)
+ * 
+ * Made with p5
+ * https://p5js.org/
+ */
+
+//Image variable
 let titleImage;
 
-//Current state
-let currentGameState = gameStates.title;
-
+//loading said image
 function preload() {
     titleImage = loadImage('assets/images/Pic1.jpg');
 }
 
+//setting up the canvas in the middle of the screen
 function setup() {
     createCanvas(600, 400)
     background(255);
 }
 
+//drawing the image and a rectangle to fill the space
 function draw() {
     drawBorder();
     image(titleImage, 3, 3, 400, height);
@@ -19,6 +33,7 @@ function draw() {
     drawTitle();
 }
 
+//Just a border, fits with the aesthetic
 function drawBorder() {
     push();
     stroke(255, 0, 0);
@@ -28,6 +43,7 @@ function drawBorder() {
     pop();
 }
 
+//The extra rectangle
 function drawRect() {
     push();
     fill('black');
@@ -35,6 +51,7 @@ function drawRect() {
     pop();
 }
 
+//Drawing the title and subtitle
 function drawTitle() {
     push();
     textSize(25);
@@ -48,33 +65,3 @@ function drawTitle() {
     text('against wakefulness', 440, 100);
     pop();
 }
-
-// function createButtons() {
-//     let buttonClock = createButton('Clock Attack');
-//     buttonClock.position(850, 250);
-//     buttonClock.size(100, 30);
-//     buttonClock.mousePressed(() => {
-//         currentGameState = gameStates.clockAttack;
-//     });
-
-//     let buttonDrowning = createButton('Drown');
-//     buttonDrowning.position(850, 300);
-//     buttonDrowning.size(100, 30);
-//     buttonDrowning.mousePressed(() => {
-//         currentGameState = gameStates.drowning;
-//     });
-
-//     let buttonPippin = createButton('The Professor');
-//     buttonPippin.position(850, 350);
-//     buttonPippin.size(100, 30);
-//     buttonPippin.mousePressed(() => {
-//         currentGameState = gameStates.pippinBarr;
-//     });
-
-//     let buttonRoulette = createButton('Bed Roulette');
-//     buttonRoulette.position(850, 400);
-//     buttonRoulette.size(100, 30);
-//     buttonRoulette.mousePressed(() => {
-//         currentGameState = gameStates.roulette;
-//     });
-// }

@@ -1,3 +1,21 @@
+/**
+ * Clock Attack
+ * 
+ * Nadia Abdul Aziz
+ * 
+ * The first of four games based on space invaders. This is the closest to the original game, rather a simplified version.
+ * Your many alarms are attempting to get you out of bed on a dreaded monday morning, destroy all the alarms!
+ * 
+ * Instructions:
+ * - Use the arrow keys to move
+ * - Use the up arrow to shoot pillows
+ * - Get rid of all the clocks before they reach the player
+ * 
+ * Made with p5
+ * https://p5js.org/
+ */
+
+
 // image variables
 let playerImg;
 let enemyImg;
@@ -26,7 +44,7 @@ let player = {
     width: 150,
     height: 150,
     speed: 5,
-    cooldown: 0  // Cooldown timer between shots, not sure if this works really
+    cooldown: 0  // Cooldown timer between shots
 };
 
 // the pillows
@@ -145,26 +163,31 @@ function drawTitleScreen() {
     textSize(48);
     textStyle(BOLD);
     text('CLOCK ATTACK', width / 2, height * 0.15);
+    pop();
 
     imageMode(CENTER);
     image(enemyImg, width / 2, height * 0.32, 70, 70); // Adjust size as needed
 
+    push();
     // Game rules
     textSize(18);
     textStyle(BOLD);
     text('HOW TO PLAY', width / 2, height * 0.5);
+    pop();
 
+    push();
     textStyle(NORMAL);
     textSize(14);
     text('1. Use LEFT and RIGHT arrow keys to march against the slumber destroyers!', width / 2, height * 0.6);
     text('2. Press the UP key to yeet pillows at your alarms!', width / 2, height * 0.65);
     text('3. Obliterate all clocks before they turn you into a functional adult', width / 2, height * 0.7);
+    pop();
 
+    push();
     fill('red');
     textStyle(BOLD);
     textSize(16);
     text('Press the__SPACEBAR__to begin', width / 2, height * 0.85);
-
     pop();
 }
 
@@ -331,43 +354,32 @@ function keyPressed() {
 }
 
 function initializeGameOver() {
+
+    //could also just write this as a string I suppose
     let gameOverText = "Game Over!"; // Defined variable for game over text
 
-    // let gameOverSubtitle = "The clocks have taken over!"; // Defined variable for game over text
-
-
     textAlign(CENTER, CENTER);
-    push();
 
+    push();
     // Display win
     fill('black');
     textStyle(BOLD);
     textSize(24);
-    //Shows specific reasoning for win/loss
     text(gameOverText, width / 2, height / 2 - 100);
     pop();
-
-    push();
-
-    // // Display win
-    // fill('black');
-    // textSize(15);
-    // //Shows specific reasoning for win/loss
-    // text(gameOverSubtitle, width / 2, height / 2 - 60);
-    // pop();
 
     // Center the image
     push();
     imageMode(CENTER);
-    image(lossImg, width / 2, height / 2, 200, 150); // Adjust size as needed
+    image(lossImg, width / 2, height / 2, 200, 150);
     pop();
 
+    push();
     // Button text
     fill('red');
     textStyle(BOLD);
     textSize(14);
     text('Press the __SPACEBAR__ to Restart', width / 2, height / 2 + 100);
-
     pop();
 }
 
@@ -412,37 +424,25 @@ function resetGame() {
     // Reset enemy movement direction
     enemyDirection = 1;
 
-    // Remove any existing UI elements from previous game state
     removeElements();
 }
 
 function initializeGameWon() {
-    let gameWonText = "You Win!"; // Defined variable for game over text
-
-    // let gameWonSubtitle = "You defeated the clocks!"; // Defined variable for game over text
+    let gameWonText = "You Win!";
 
 
     textAlign(CENTER, CENTER);
-    push();
 
+    push();
     // Display win
     fill('black');
     textStyle(BOLD);
     textSize(24);
-    //Shows specific reasoning for win/loss
     text(gameWonText, width / 2, height / 2 - 90);
     pop();
 
     push();
-
-    // // Display win
-    // fill('black');
-    // textSize(15);
-    // //Shows specific reasoning for win/loss
-    // text(gameWonSubtitle, width / 2, height / 2 - 30);
-    // pop();
-
-    push();
     imageMode(CENTER);
-    image(winImg, width / 2, height / 2, 100, 50); // Adjust size as needed
+    image(winImg, width / 2, height / 2, 100, 50);
+    pop();
 }

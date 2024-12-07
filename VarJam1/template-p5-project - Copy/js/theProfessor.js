@@ -1,3 +1,26 @@
+/**
+ * The Professor
+ * 
+ * Nadia Abdul Aziz
+ * 
+ * The third of four games based on space invaders. The original mechanics are completely conserved, but the player now has the added task of avoiding an obstacle (professor) 
+ * Silence your clocks and escape your professor who has been pestering you to show up for that 8am class!
+ * 
+ * Instructions:
+ * - Use the left and right arrow keys to move
+ * - press the spacebar to jump over your professor
+ * - press the up arrow key to shoot
+ * - Clear all your alarms before your professor catches up to you!
+ * 
+ * Made with p5
+ * https://p5js.org/
+ * 
+ * Modified the code of clock invaders, same base code, not very many comments except for the changes made.
+ */
+
+
+
+
 // image variables
 let playerImg;
 let enemyImg;
@@ -16,31 +39,30 @@ const gameWon = 'game won';
 // Track the current state of the game
 let gameState = titleScreen;
 
-//setting other two states to false
-//I did this earlier but I can just remove this and change how they're called now that I have my title screen...but eh, I'm lazy.
+//setting states to false
 let gameOverInitialized = false;
 let gameWonInitialized = false;
 
 //Angry guy
 let player = {
     x: 320,
-    y: 500, // Lowered resting position
+    y: 500,
     width: 120,
     height: 120,
     speed: 6,
-    cooldown: 0,  // Cooldown timer between shots, not sure if this works really
-    ySpeed: 0,
-    isOnGround: true
+    cooldown: 0,
+    ySpeed: 0, //speed for when jumping, 0 when at rest because the player does not move in Y
+    isOnGround: true //tracking if the player is at the bottom of the canvas, not jumping
 };
 
-//The follower
+//The follower that chases the player
 let professor = {
     x: 50,
     y: 450,
     width: 65,
     height: 65,
-    speed: 2, // Reduced professor speed
-    active: false   // Initially doesn't move
+    speed: 2,
+    active: false   // Initially doesn't move, starts after a delay
 };
 
 // the pillows
@@ -49,17 +71,15 @@ let bullet = {
     y: 0,
     width: 50,
     height: 50,
-    active: false, //not currently being thrown
+    active: false,
     speed: 7
 };
 
 // Array to store alarm clocks
-//Essentially just dissapears under the background overlay
-//Should this be an object?
 let enemies = [];
-const enemyRows = 3;     // Number of rows
-const enemyCols = 6;     // Number of columns
-let enemyDirection = 1;   // Direction of movement (1 for right, -1 for left)
+const enemyRows = 3;
+const enemyCols = 6;
+let enemyDirection = 1;
 
 
 //Load all images
@@ -73,32 +93,26 @@ function preload() {
     angryProfessorImg = loadImage('assets/images/angryProfessor.png');
 }
 
-
+//creates the canvas and the enemies that the player must defeat
 function setup() {
     createCanvas(640, 480);
     imageMode(CENTER);
     // Initialize enemies in a grid formation
-    // Could have also used a while loop
-    // Wouldn't run as its own function
-    // So I discovered the ++ thing, basically x + 1, one of the tutorials did this
-    // Outer loop iterates the rows and the inner one iterates through the columns
     for (let row = 0; row < enemyRows; row++) {
         for (let col = 0; col < enemyCols; col++) {
             enemies.push({
                 x: col * 80 + 100,
-                //spreading them horizontally, 80 pixels apart + offset of 100 from the edge
                 y: row * 60 + 50,
-                //vertical
                 width: 50,
                 height: 45,
-                alive: true //Initial state of not yet shot at
+                alive: true
             });
         }
     }
 }
 
+// handles statement to switch between states
 function draw() {
-    // Use a switch statement to handle different game states
     switch (gameState) {
         case titleScreen:
             background(255);
@@ -106,32 +120,27 @@ function draw() {
             drawTitleScreen();
             break;
         case gamePlaying:
-            // Clear the background with white, hiding the previous array generations because I have no idea how to get rid of them. 
             background(255);
             drawBorder();
             updateGame();
-            //Contains all the actual game functions
             break;
         case gameOver:
-            // ! means only run if it isn't already running, same as === false
             if (!gameOverInitialized) {
                 initializeGameOver();
                 gameOverInitialized = true;
             }
-            //Added this to prevent drawing the game elements during game over
-            background(255); //white background
+            background(255);
             drawBorder();
-            drawGameOverScreen(); //had trouble getting it to actually draw so I'm calling initgameover a second time here.
+            drawGameOverScreen();
             break;
         case gameWon:
             if (!gameWonInitialized) {
                 initializeGameWon();
                 gameWonInitialized = true;
-                //Winning screen, prompt to go back home
             }
-            background(255); // Added background clear for gameWon state
+            background(255);
             drawBorder();
-            initializeGameWon(); // Redraw the win screen every frame
+            initializeGameWon();
             break;
     }
     // Show/hide the hyperlink based on gameState
@@ -152,6 +161,8 @@ function drawBorder() {
     rect(0, 0, width, height);
     pop();
 }
+
+//opening screen
 function drawTitleScreen() {
     textAlign(CENTER, CENTER);
 
@@ -163,7 +174,7 @@ function drawTitleScreen() {
     text('THE PROFESSOR', width / 2, height * 0.15);
 
     imageMode(CENTER);
-    image(professorImg, width / 2, height * 0.32, 70, 60); // Adjust size as needed
+    image(professorImg, width / 2, height * 0.32, 70, 60);
 
     // Game rules
     textSize(18);
@@ -177,6 +188,7 @@ function drawTitleScreen() {
     text('3. Snub your alarms to skip that dreaded 8am class!', width / 2, height * 0.7);
     text('4. Now run away from your professor you coward...pressing the SPACEBAR to jump might help.', width / 2, height * 0.75);
 
+    //button
     fill('red');
     textStyle(BOLD);
     textSize(16);
@@ -188,13 +200,13 @@ function drawTitleScreen() {
 //All gameplay functions
 function updateGame() {
     if (gameState === gamePlaying) {
-        updatePlayer(); // Add this line to apply gravity and vertical movement
+        updatePlayer(); //handling gravity and jumping
         drawPlayer();
         movePlayer();
         shootBullet();
         updateEnemy();
-        updateProfessor();
-        drawProfessor();
+        updateProfessor();//movement of the professor
+        drawProfessor(); //image
     }
 }
 
@@ -213,7 +225,6 @@ function drawPlayer() {
 
 //Handles keyboard input to move the angry man
 function movePlayer() {
-    // Existing horizontal movement
     if (keyIsDown(LEFT_ARROW) && player.x > 0) {
         player.x -= player.speed;
     }
@@ -224,12 +235,12 @@ function movePlayer() {
 
 function updatePlayer() {
     // Apply gravity
-    player.ySpeed += 0.4; // Adjust this value to control gravity strength
+    player.ySpeed += 0.4; //gravity strength, how high player can go
     player.y += player.ySpeed;
 
     // Ground collision
-    if (player.y >= 450) { // Adjusted ground collision
-        player.y = 450; // Adjusted ground position
+    if (player.y >= 450) { //ground collision
+        player.y = 450; //ground position
         player.ySpeed = 0;
         player.isOnGround = true;
     } else {
@@ -239,16 +250,15 @@ function updatePlayer() {
 
 //Anything to do with flinging the pillows at the clocks
 function shootBullet() {
-    //set to zero when the game starts already so this is a bit redundant, but I'll keep it anyway. 
     if (player.cooldown > 0) {
-        player.cooldown--; //player can only shoot once it reaches zero, decrement
+        player.cooldown--;
     }
     // Draw and move bullet
     if (bullet.active) {
         //draw the pillow
         image(bulletImg, bullet.x + bullet.width / 2, bullet.y + bullet.height / 2,
             bullet.width, bullet.height);
-        bullet.y -= bullet.speed;  // Move bullet upwards
+        bullet.y -= bullet.speed;
 
         // Deactivate pillow if it goes off screen
         if (bullet.y < 0) {
@@ -265,14 +275,12 @@ function updateEnemy() {
     let enemiesAlive = false;
 
     // Check if enemies need to change direction
-    // forEach iterates through the array, was the most efficient way I found.
     enemies.forEach(enemy => {
         if (enemy.alive) {
             enemiesAlive = true;
             // Check if enemies have hit canvas bounds
             if ((enemy.x + enemy.width > width && enemyDirection > 0) ||
                 (enemy.x < 0 && enemyDirection < 0)) {
-                //if yes, then move, see next part
                 moveDown = true;
             }
         }
@@ -286,13 +294,13 @@ function updateEnemy() {
                 enemy.y += 20;
             }
             // Move enemies horizontally
-            enemy.x += enemyDirection * 1; // Reduced enemy speed
+            enemy.x += enemyDirection * 1; // Reduced enemy speed to make it easier for the player to manage with the professor
 
             // Draw the actual clock
             image(enemyImg, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2,
                 enemy.width, enemy.height);
 
-            // Check for bullet collision, set to dead
+            // Check for bullet collision
             if (bullet.active && collision(bullet, enemy)) {
                 enemy.alive = false;
                 bullet.active = false;
@@ -317,7 +325,6 @@ function updateEnemy() {
 }
 
 // Check collision between two variables
-//Consulted collison tutorials
 function collision(bullet, enemy) {
     return bullet.x < enemy.x + enemy.width &&
         bullet.x + bullet.width > enemy.x &&
@@ -358,7 +365,7 @@ function keyPressed() {
 // New function to update professor movement
 function updateProfessor() {
     // Activate professor after a delay 
-    if (frameCount > 50) { // Adjust this value to control when professor becomes active
+    if (frameCount > 50) { // 50 frame delay
         professor.active = true;
     }
 
@@ -393,13 +400,10 @@ function checkProfessorCollision() {
 
     let padding = 30; // Consistent padding
 
-    //Slight issue with assymetry on the right side when colliding, 
+    //Slight issue with assymetry on the right side when colliding
     return (
         //Drawing this out on a piece of paper to fix the bug
-        //IVE BEEN AT THIS FOR AN HOUR
-        //if the player's x location (left) plus the padding is smaller than the professor's x location + the professor's width minus the padding (left collision)
-        //if the player's x location left + the player's width minus padding
-        //
+        //IVE BEEN AT THIS FOR TWO HOURS...whatever, it's not too bad
         player.x + padding < professor.x + professor.width - padding &&
         player.x + player.width > professor.x &&
         player.y + padding < professor.y + professor.height - padding &&
@@ -410,28 +414,16 @@ function checkProfessorCollision() {
 function initializeGameOver() {
     let gameOverText = "Game Over!"; // Defined variable for game over text
 
-    // let gameOverSubtitle = "The clocks have taken over!"; // Defined variable for game over text
-
 
     textAlign(CENTER, CENTER);
-    push();
 
-    // Display win
+    push();
+    // Display loss
     fill('black');
     textStyle(BOLD);
     textSize(24);
-    //Shows specific reasoning for win/loss
     text(gameOverText, width / 2, height / 2 - 100);
     pop();
-
-    push();
-
-    // // Display win
-    // fill('black');
-    // textSize(15);
-    // //Shows specific reasoning for win/loss
-    // text(gameOverSubtitle, width / 2, height / 2 - 60);
-    // pop();
 
     // Center the image
     push();
@@ -439,6 +431,7 @@ function initializeGameOver() {
     image(angryProfessorImg, width / 2, height / 2, 100, 90); // Adjust size as needed
     pop();
 
+    push();
     // Button text
     fill('red');
     textStyle(BOLD);
@@ -462,15 +455,15 @@ function resetGame() {
 
     // Reset player position and cooldown
     player.x = 320;
-    player.y = 420; // Adjusted reset position
+    player.y = 420; // Adjusted reset position for smaller size
     player.cooldown = 0;
-    player.width = 120; // Reset player width
-    player.height = 120; // Reset player height
+    player.width = 120;
+    player.height = 120;
 
     // Reset bullet
     bullet.active = false;
-    bullet.width = 50; // Reset bullet width
-    bullet.height = 50; // Reset bullet height
+    bullet.width = 50;
+    bullet.height = 50;
 
     //reset professor
     professor.x = 50;
@@ -484,8 +477,8 @@ function resetGame() {
             enemies.push({
                 x: col * 80 + 100,
                 y: row * 60 + 50,
-                width: 50, // Reset enemy width
-                height: 45, // Reset enemy height
+                width: 50,
+                height: 45,
                 alive: true
             });
         }
@@ -501,30 +494,19 @@ function resetGame() {
 function initializeGameWon() {
     let gameWonText = "You Win!"; // Defined variable for game over text
 
-    // let gameWonSubtitle = "You defeated the clocks!"; // Defined variable for game over text
-
 
     textAlign(CENTER, CENTER);
-    push();
 
+    push();
     // Display win
     fill('black');
     textStyle
     textSize(24);
-    //Shows specific reasoning for win/loss
     text(gameWonText, width / 2, height / 2 - 90);
     pop();
 
     push();
-
-    // // Display win
-    // fill('black');
-    // textSize(15);
-    // //Shows specific reasoning for win/loss
-    // text(gameWonSubtitle, width / 2, height / 2 - 30);
-    // pop();
-
-    push();
     imageMode(CENTER);
     image(winImg, width / 2, height / 2, 100, 50); // Adjust size as needed
+    pop();
 }

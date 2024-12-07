@@ -1,6 +1,6 @@
-# Really annoying rock paper scissor
+# Really annoying rock paper scissor, backgammon, connect 4, all the iterations and ideas I didn't use
 
-Current Option: 
+Current Option (Halfway built then abandonned): 
 
 - Overly Complicated Backgammon   
 

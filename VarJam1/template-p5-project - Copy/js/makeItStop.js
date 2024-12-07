@@ -1,3 +1,25 @@
+/**
+ * PLEASE!! MAKE IT STOP!!
+ * 
+ * Nadia Abdul Aziz
+ * 
+ * The second of four games based on space invaders. The player does not have the ability to win this game (or do they?) and are faced with the unavoidable after three unsuccessful attempts.
+ * Your alarms have surrounded you and you cannot escape the dreaded wake up call! 
+ * 
+ * 
+ * Instructions:
+ * - Use the left and right arrow keys to move
+ * - Use the up arrow key to shoot upwards, use the down arrow key to shoot downwards
+ * - Make your best attempt at silencing the alarms.
+ * - Just because it is pointless, doesn't mean you shouldn't try
+ * 
+ * Made with p5
+ * https://p5js.org/
+ * 
+ * Modified the code of clock invaders, same base code, not very many comments except for the changes made.
+ * Removed all direction change functionality from the previous game
+ */
+
 // image variables
 let playerImg;
 let enemyImg;
@@ -10,19 +32,17 @@ let defeatImg;
 const titleScreen = 'title screen';
 const gamePlaying = 'playing';
 const gameOver = 'game over';
-const gameWon = 'game won';
-const gameOverThreeTimes = 'game over three times'; // New game state
+const gameWon = 'game won'; //pointless, but exists in case some insane person makes it through
+const gameOverThreeTimes = 'game over three times'; // New game state when the player loses three times
 
 // Track the current state of the game
 let gameState = titleScreen;
 
-//setting other two states to false
-//I did this earlier but I can just remove this and change how they're called now that I have my title screen...but eh, I'm lazy.
 let gameOverInitialized = false;
 let gameWonInitialized = false;
 let gameOverThreeTimesInitialized = false; // Initialize for the new game state
 
-// Track number of game overs
+// Track the number of game overs
 let gameOverCount = 0;
 
 //Angry guy
@@ -32,7 +52,7 @@ let player = {
     width: 150,
     height: 150,
     speed: 5,
-    cooldown: 0  // Cooldown timer between shots, not sure if this works really
+    cooldown: 0
 };
 
 // the pillows
@@ -41,18 +61,14 @@ let bullet = {
     y: 0,
     width: 50,
     height: 50,
-    active: false, //not currently being thrown
+    active: false,
     speed: 7
 };
 
 // Array to store alarm clocks
-//Essentially just dissapears under the background overlay
-//Should this be an object?
 let enemies = [];
-const enemyRows = 50;     // Reduced number of rows for better performance with double enemies
+const enemyRows = 20;     // Stupidly huge number, making it impossible but still technically possible if someone is really motivated
 const enemyCols = 6;     // Number of columns
-let enemyDirection = 1;   // Direction of movement (1 for right, -1 for left)
-
 
 //Load all images
 function preload() {
@@ -61,7 +77,7 @@ function preload() {
     bulletImg = loadImage('assets/images/pillow.png');
     lossImg = loadImage('assets/images/loss.jpg');
     winImg = loadImage('assets/images/z.png')
-    defeatImg = loadImage('assets/images/defeat.png')
+    defeatImg = loadImage('assets/images/defeat.png') //new image for gameOverThreeTimes
 }
 
 
@@ -105,25 +121,21 @@ function draw() {
             drawTitleScreen();
             break;
         case gamePlaying:
-            // Clear the background with white, hiding the previous array generations because I have no idea how to get rid of them. 
             background(255);
             drawBorder();
             updateGame();
-            //Contains all the actual game functions
             break;
         case gameOver:
-            // ! means only run if it isn't already running, same as === false
             if (!gameOverInitialized) {
-                gameOverCount++; // Increment loss counter
+                gameOverCount++; // Increment the new game over counter to track how many times the user lost.
                 initializeGameOver();
                 gameOverInitialized = true;
             }
-            //Added this to prevent drawing the game elements during game over
-            background(255); //white background
+            background(255);
             drawBorder();
-            drawGameOverScreen(); //had trouble getting it to actually draw so I'm calling initgameover a second time here.
+            drawGameOverScreen();
             if (gameOverCount >= 3) {
-                gameState = gameOverThreeTimes; // Transition to new game over state
+                gameState = gameOverThreeTimes; // Transition to new game over state if the player loses three times
             }
             break;
         case gameWon:
@@ -132,21 +144,21 @@ function draw() {
                 gameWonInitialized = true;
                 //Winning screen, prompt to go back home
             }
-            background(255); // Added background clear for gameWon state
+            background(255);
             drawBorder();
-            initializeGameWon(); // Redraw the win screen every frame
+            initializeGameWon();
             break;
-        case gameOverThreeTimes:
+        case gameOverThreeTimes: //the new state
             if (!gameOverThreeTimesInitialized) {
                 initializeGameOverThreeTimes();
                 gameOverThreeTimesInitialized = true;
             }
-            background(255);
-            drawBorder();
+            background(255); //still putting this here to clear
+            drawBorder(); //I need to put this here too because it wasn't working globally.
             drawGameOverThreeTimesScreen();
             break;
     }
-    // Show/hide the hyperlink based on gameState
+    // Show/hide the hyperlink based on gameState, added the new state
     let homeLink = document.getElementById('homeLink');
     if (gameState === gameWon || gameState === gameOverThreeTimes) {
         homeLink.style.display = 'block';
@@ -155,7 +167,7 @@ function draw() {
     }
 }
 
-//Drawing outer border. 
+//the border
 function drawBorder() {
     push();
     noFill();
@@ -164,30 +176,35 @@ function drawBorder() {
     rect(0, 0, width, height);
     pop();
 }
+
+//drawing all the instructions and intro
 function drawTitleScreen() {
     textAlign(CENTER, CENTER);
 
+    //title
     push();
-    // Title
     fill('black');
     textSize(40);
     textStyle(BOLD);
     text('PLEASE!! MAKE IT STOP!!!', width / 2, height * 0.15);
 
+    //image
     imageMode(CENTER);
-    image(bulletImg, width / 2, height * 0.32, 90, 80); // Adjust size as needed
+    image(bulletImg, width / 2, height * 0.32, 90, 80);
 
-    // Game rules
+    //subtitle
     textSize(18);
     textStyle(BOLD);
     text('HOW TO PLAY', width / 2, height * 0.5);
 
+    //instructions
     textStyle(NORMAL);
     textSize(14);
     text('1. Use LEFT and RIGHT arrow keys to defend your spot in the warmth of your blanket!', width / 2, height * 0.6);
     text('2. Press the UP and DOWN arrow keys to silence the tyrants...well, if you can!', width / 2, height * 0.65);
     text('3. Want 5 more minutes? Vanquish your endless alarms...', width / 2, height * 0.7);
 
+    //play button
     fill('red');
     textStyle(BOLD);
     textSize(16);
@@ -198,12 +215,7 @@ function drawTitleScreen() {
 
 //All gameplay functions
 function updateGame() {
-    //had a bug, fixed it but leaving this here in case I need it again.
-    // console.log(player.x);
-    // console.log(player.y);
-    // console.log(bullet.active);
 
-    //only draw if the state is playing, fixing bug to only draw during playing state issue
     if (gameState === gamePlaying) {
         updateEnemy();
         drawPlayer();
@@ -217,10 +229,8 @@ function updateGame() {
 function drawPlayer() {
     push();
 
-    // Translate the player image to follow input
     translate(player.x + player.width / 2, player.y + player.height / 2);
 
-    // Draw the angry man
     image(playerImg, 0, -70, player.width, player.height);
 
     pop();
@@ -229,7 +239,6 @@ function drawPlayer() {
 //Handles keyboard input to move the angry man
 function movePlayer() {
 
-    //Moving when left and right key is pressed and constraining to canvas bounds
     if (keyIsDown(LEFT_ARROW) && player.x > 0) {
         player.x -= player.speed;
     }
@@ -241,18 +250,15 @@ function movePlayer() {
 
 //Anything to do with flinging the pillows at the clocks
 function shootBullet() {
-    //set to zero when the game starts already so this is a bit redundant, but I'll keep it anyway. 
     if (player.cooldown > 0) {
-        player.cooldown--; //player can only shoot once it reaches zero, decrement
+        player.cooldown--;
     }
-    // Draw and move bullet
     if (bullet.active) {
-        //draw the pillow
         image(bulletImg, bullet.x + bullet.width / 2, bullet.y + bullet.height / 2,
             bullet.width, bullet.height);
-        bullet.y -= bullet.speed;  // Move bullet upwards
+        bullet.y -= bullet.speed;  // Move bullet towards direction pressed
 
-        // Deactivate pillow if it goes off screen
+        // Deactivate pillow if it goes off screen in both directions
         if (bullet.y < 0 || bullet.y > height) {
             bullet.active = false;
         }
@@ -277,14 +283,13 @@ function updateEnemy() {
     //Update enemy positions and check for collisions
     enemies.forEach(enemy => {
         if (enemy.alive) {
-            // Move enemies vertically
-            enemy.y += enemy.speed; // Move enemies downwards
+            enemy.y += enemy.speed;
 
             // Draw the actual clock
             image(enemyImg, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2,
                 enemy.width, enemy.height);
 
-            // Check for bullet collision, set to dead
+            // Check for bullet collision
             if (bullet.active && collision(bullet, enemy)) {
                 enemy.alive = false;
                 bullet.active = false;
@@ -298,14 +303,13 @@ function updateEnemy() {
     });
 
 
-    // Check if all enemies are defeated, trigger win screen
+    // Check if all enemies are defeated, trigger win screen, pretty much impossible
     if (!enemiesAlive) {
         gameState = gameWon;
     }
 }
 
 // Check collision between two variables
-//Consulted collison tutorials
 function collision(bullet, enemy) {
     return bullet.x < enemy.x + enemy.width &&
         bullet.x + bullet.width > enemy.x &&
@@ -344,49 +348,33 @@ function keyPressed() {
     if (keyCode === 32 && gameState === gameOver) {
         resetGame();
     }
-    if (keyCode === 32 && gameState === gameOverThreeTimes) {
-        resetGameThreeTimes();
-    }
 }
 
 function initializeGameOver() {
     let gameOverText = "Game Over!"; // Defined variable for game over text
 
-    // let gameOverSubtitle = "The clocks have taken over!"; // Defined variable for game over text
-
-
     textAlign(CENTER, CENTER);
-    push();
 
+    push();
     // Display win
     fill('black');
     textStyle(BOLD);
     textSize(24);
-    //Shows specific reasoning for win/loss
     text(gameOverText, width / 2, height / 2 - 100);
     pop();
-
-    push();
-
-    // // Display win
-    // fill('black');
-    // textSize(15);
-    // //Shows specific reasoning for win/loss
-    // text(gameOverSubtitle, width / 2, height / 2 - 60);
-    // pop();
 
     // Center the image
     push();
     imageMode(CENTER);
-    image(lossImg, width / 2, height / 2, 200, 150); // Adjust size as needed
+    image(lossImg, width / 2, height / 2, 200, 150);
     pop();
 
+    push();
     // Button text
     fill('red');
     textStyle(BOLD);
     textSize(14);
     text('Press the __SPACEBAR__ to Restart', width / 2, height / 2 + 100);
-
     pop();
 }
 
@@ -407,25 +395,25 @@ function resetGame() {
     player.x = 250;
     player.y = 240;
     player.cooldown = 0;
-    player.width = 150; // Reset player width
-    player.height = 150; // Reset player height
+    player.width = 150;
+    player.height = 150;
 
     // Reset bullet
     bullet.active = false;
-    bullet.width = 50; // Reset bullet width
-    bullet.height = 50; // Reset bullet height
+    bullet.width = 50;
+    bullet.height = 50;
 
-    // Recreate enemy grid
+    // Recreate enemy grid, up and down
     enemies = [];
     for (let row = 0; row < enemyRows; row++) {
         for (let col = 0; col < enemyCols; col++) {
             enemies.push({
                 x: col * 80 + 100,
                 y: -60 - row * 60, // Start above the screen
-                width: 50, // Reset enemy width
-                height: 45, // Reset enemy height
+                width: 50,
+                height: 45,
                 alive: true,
-                speed: 0.5 // Add speed for vertical movement
+                speed: 0.5
             });
         }
     }
@@ -433,60 +421,50 @@ function resetGame() {
         for (let col = 0; col < enemyCols; col++) {
             enemies.push({
                 x: col * 80 + 100,
-                y: height + 60 + row * 60, // Start below the screen
-                width: 50, // Reset enemy width
-                height: 45, // Reset enemy height
+                y: height + 60 + row * 60, //below
+                width: 50,
+                height: 45,
                 alive: true,
-                speed: -0.5 // Add speed for vertical movement, negative for upwards
+                speed: -0.5
             });
         }
     }
 
-    // Remove any existing UI elements from previous game state
     removeElements();
 }
 
+//game won screen 
 function initializeGameWon() {
-    let gameWonText = "You Win!"; // Defined variable for game over text
 
-    // let gameWonSubtitle = "You defeated the clocks!"; // Defined variable for game over text
-
+    let gameWonText = "You Win!";
 
     textAlign(CENTER, CENTER);
-    push();
 
+    push();
     // Display win
     fill('black');
     textStyle(BOLD);
     textSize(24);
-    //Shows specific reasoning for win/loss
     text(gameWonText, width / 2, height / 2 - 90);
     pop();
 
     push();
-
-    // // Display win
-    // fill('black');
-    // textSize(15);
-    // //Shows specific reasoning for win/loss
-    // text(gameWonSubtitle, width / 2, height / 2 - 30);
-    // pop();
-
-    push();
     imageMode(CENTER);
-    image(winImg, width / 2, height / 2, 100, 50); // Adjust size as needed
+    image(winImg, width / 2, height / 2, 100, 50);
+    pop();
 }
 
+//drawing the screen when the player loses too much
 function initializeGameOverThreeTimes() {
     let gameOverThreeText = "THERE'S NO WINNING THIS ONE"; // Defined variable for game over text
 
-    let gameOverThreeSubtitle = "You must get up and face your problems..."; // Defined variable for game over text
+    let gameOverThreeSubtitle = "You must get up and face your problems..."; // Defined subtitle
 
 
     textAlign(CENTER, CENTER);
-    push();
 
-    // Display win
+    push();
+    // Display loss
     fill('black');
     textStyle(BOLD);
     textSize(24);
@@ -494,15 +472,13 @@ function initializeGameOverThreeTimes() {
     pop();
 
     push();
-
-    // Display win
+    // Display subtitle
     fill('black');
     textSize(15);
-    //Shows specific reasoning for win/loss
     text(gameOverThreeSubtitle, width / 2, height / 2 - 60);
     pop();
 
-    // Center the image
+    //image
     push();
     imageMode(CENTER);
     image(defeatImg, width / 2, height / 2 + 15, 150, 75); // Adjust size as needed
@@ -510,11 +486,13 @@ function initializeGameOverThreeTimes() {
 
 }
 
+//making sure it actually works
 function drawGameOverThreeTimesScreen() {
     initializeGameOverThreeTimes();
 }
 
+//resetting it
 function resetGameThreeTimes() {
-    gameOverCount = 0; // Reset loss counter
+    gameOverCount = 0; // Reset loss counter back to zero
     resetGame(); // Reuse existing reset function
 }

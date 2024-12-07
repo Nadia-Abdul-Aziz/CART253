@@ -1,3 +1,25 @@
+/**
+ * The Mother - The Final Boss
+ * 
+ * Nadia Abdul Aziz
+ * 
+ * The last of four games based on space invaders. The player must defeat the boss before the clocks reach them, or destroy the clocks to prevent them from moving down. 
+ * Face the wrath of your angry mother trying to get you out of bed and hopefully make her give up and leave you alone.  
+ * 
+ * Instructions:
+ * - Use the left and right arrow keys to move
+ * - press the up arrow key to shoot
+ * - Clear alarms to prevent them from moving down!
+ * - Wear the boss's health down until they are no more!
+ * - don't let your health bar reach zero!
+ * 
+ * Made with p5
+ * https://p5js.org/
+ * 
+ * Modified the code of MAKE IT STOP, same base code, not very many comments except for the changes made.
+ */
+
+
 // image variables
 let playerImg;
 let enemyImg;
@@ -8,6 +30,7 @@ let bossImg;
 let slipperImg;
 let angryMotherImg;
 let sleepImg;
+
 // Game states
 const titleScreen = 'title screen';
 const gamePlaying = 'playing';
@@ -17,12 +40,12 @@ const gameWon = 'game won';
 // Track the current state of the game
 let gameState = titleScreen;
 
-//setting other two states to false
+//setting other states to false
 let gameOverInitialized = false;
 let gameWonInitialized = false;
 
-// Track number of game overs
-let gameOverCount = 0;
+// // Track number of game overs
+// let gameOverCount = 0;
 
 //Angry guy
 let player = {
@@ -31,7 +54,7 @@ let player = {
     width: 150,
     height: 150,
     speed: 5,
-    cooldown: 0  // Cooldown timer between shots, not sure if this works really
+    cooldown: 0
 };
 
 // the pillows
@@ -40,7 +63,7 @@ let bullet = {
     y: 0,
     width: 50,
     height: 50,
-    active: false, //not currently being thrown
+    active: false,
     speed: 7
 };
 
@@ -51,16 +74,14 @@ let boss = {
 };
 
 // Array to store alarm clocks
-//Essentially just dissapears under the background overlay
-//Should this be an object?
 let enemies = [];
 const enemyRows = 50;     // Essentially unlimited, until the boss dies
-const enemyCols = 2;     // Number of columns
+const enemyCols = 2;     // Number of columns, only two then duplicated later
 
 //combat variables
-let bossBullets = [];
-let playerHealth = 100;
-let bossHealth = 100;
+let bossBullets = []; //array for boss variables
+let playerHealth = 100; //health count
+let bossHealth = 100; //health count
 
 
 //Load all images
@@ -84,31 +105,30 @@ function setup() {
     for (let row = 0; row < enemyRows; row++) {
         for (let col = 0; col < enemyCols; col++) {
             enemies.push({
-                x: col * 80 + 100, // Adjusted x-coordinate calculation
+                x: col * 80 + 100, // left side X cooordinate
                 y: -60 - row * 60, // Start above the screen
                 width: 50,
                 height: 45,
                 alive: true,
-                speed: 0.5 // Move downwards
+                speed: 0.5
             });
         }
     }
     for (let row = 0; row < enemyRows; row++) {
         for (let col = 0; col < enemyCols; col++) {
             enemies.push({
-                x: col * 80 + 400, // Adjusted x-coordinate calculation
+                x: col * 80 + 400, // right side X coordinate
                 y: -60 - row * 60, // Start above the screen
                 width: 50,
                 height: 45,
                 alive: true,
-                speed: 0.5 // Move downwards
+                speed: 0.5
             });
         }
     }
 }
-
+// houses switch statement to handle different game states
 function draw() {
-    // Use a switch statement to handle different game states
     switch (gameState) {
         case titleScreen:
             background(255);
@@ -116,33 +136,27 @@ function draw() {
             drawTitleScreen();
             break;
         case gamePlaying:
-            // Clear the background with white, hiding the previous array generations because I have no idea how to get rid of them. 
             background(255);
             drawBorder();
             updateGame();
-            //Contains all the actual game functions
             break;
         case gameOver:
-            // ! means only run if it isn't already running, same as === false
             if (!gameOverInitialized) {
-                gameOverCount++; // Increment loss counter
                 initializeGameOver();
                 gameOverInitialized = true;
             }
-            //Added this to prevent drawing the game elements during game over
-            background(255); //white background
+            background(255);
             drawBorder();
-            drawGameOverScreen(); //had trouble getting it to actually draw so I'm calling initgameover a second time here.
+            drawGameOverScreen();
             break;
         case gameWon:
             if (!gameWonInitialized) {
                 initializeGameWon();
                 gameWonInitialized = true;
-                //Winning screen, prompt to go back home
             }
-            background(255); // Added background clear for gameWon state
+            background(255);
             drawBorder();
-            initializeGameWon(); // Redraw the win screen every frame
+            initializeGameWon();
             break;
     }
     // Show/hide the hyperlink based on gameState
@@ -163,6 +177,8 @@ function drawBorder() {
     rect(0, 0, width, height);
     pop();
 }
+
+//instructions
 function drawTitleScreen() {
     textAlign(CENTER, CENTER);
 
@@ -172,9 +188,10 @@ function drawTitleScreen() {
     textSize(48);
     textStyle(BOLD);
     text('THE MOTHER', width / 2, height * 0.15);
+    pop();
 
     push();
-    // Title
+    // subtitle
     fill('red');
     textSize(14);
     textStyle(BOLD);
@@ -182,8 +199,9 @@ function drawTitleScreen() {
     pop();
 
     imageMode(CENTER);
-    image(bossImg, width / 2, height * 0.35, 70, 60); // Adjust size as needed
+    image(bossImg, width / 2, height * 0.35, 70, 60);
 
+    push();
     // Game rules
     textSize(18);
     textStyle(BOLD);
@@ -206,12 +224,6 @@ function drawTitleScreen() {
 
 //All gameplay functions
 function updateGame() {
-    //had a bug, fixed it but leaving this here in case I need it again.
-    // console.log(player.x);
-    // console.log(player.y);
-    // console.log(bullet.active);
-
-    //only draw if the state is playing, fixing bug to only draw during playing state issue
     if (gameState === gamePlaying) {
 
         drawPlayerBoss();
@@ -229,7 +241,7 @@ function updateGame() {
 
 };
 
-//Draws the image for the player
+//Draws the image for the player and the boss
 function drawPlayerBoss() {
     push();
 
@@ -241,18 +253,19 @@ function drawPlayerBoss() {
 
     pop();
 
-    // Draw Bugzilla
+    // Draw the mother
     push();
     translate(boss.x, boss.y);
     imageMode(CENTER);
     image(bossImg, 0, 30, boss.size, boss.size);
     pop();
 
-    // Draw boss bullets
+    // Draw mother bullets
     bossBullets.forEach(bullet => {
         ellipse(bullet.x, bullet.y, 8, 8);
     });
 
+    //drawing the display bars to view health levels
     drawHealthBars();
 };
 
@@ -271,16 +284,15 @@ function movePlayer() {
 
 //Anything to do with flinging the pillows at the clocks
 function shootBullet() {
-    //set to zero when the game starts already so this is a bit redundant, but I'll keep it anyway. 
     if (player.cooldown > 0) {
-        player.cooldown--; //player can only shoot once it reaches zero, decrement
+        player.cooldown--;
     }
     // Draw and move bullet
     if (bullet.active) {
         //draw the pillow
         image(bulletImg, bullet.x + bullet.width / 2, bullet.y + bullet.height / 2,
             bullet.width, bullet.height);
-        bullet.y -= bullet.speed;  // Move bullet upwards
+        bullet.y -= bullet.speed;
 
         // Deactivate pillow if it goes off screen
         if (bullet.y < 0 || bullet.y > height) {
@@ -291,16 +303,12 @@ function shootBullet() {
 
 //Everything to do with the alarm clocks
 function updateEnemy() {
-
-    //variables
     let enemiesAlive = false;
 
-    // Check if enemies need to change direction
-    // forEach iterates through the array, was the most efficient way I found.
+    //used to contain the change direction logic, i'm leaving only this here just in case
     enemies.forEach(enemy => {
         if (enemy.alive) {
             enemiesAlive = true;
-            //Removed enemy direction change code
         }
     });
 
@@ -308,13 +316,13 @@ function updateEnemy() {
     enemies.forEach(enemy => {
         if (enemy.alive) {
             // Move enemies vertically
-            enemy.y += enemy.speed; // Move enemies downwards
+            enemy.y += enemy.speed;
 
             // Draw the actual clock
             image(enemyImg, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2,
                 enemy.width, enemy.height);
 
-            // Check for bullet collision, set to dead
+            // Check for bullet collision
             if (bullet.active && collision(bullet, enemy)) {
                 enemy.alive = false;
                 bullet.active = false;
@@ -335,7 +343,6 @@ function updateEnemy() {
 }
 
 // Check collision between two variables
-//Consulted collison tutorials
 function collision(bullet, enemy) {
     return bullet.x < enemy.x + enemy.width &&
         bullet.x + bullet.width > enemy.x &&
@@ -343,10 +350,11 @@ function collision(bullet, enemy) {
         bullet.y + bullet.height > enemy.y;
 }
 
+//corellation between the player's bullets and the boss's health
 function bossBulletCollision() {
-    // Check if bullet is active
+    // Check if the player's bullet is active
     if (bullet.active) {
-        // Calculate boss boundaries accounting for centered image
+        // Calculate boss boundaries accounting for centered image (this was a pain)
         let bossLeft = boss.x - boss.size / 2;
         let bossRight = boss.x + boss.size / 2;
         let bossTop = boss.y - boss.size / 2;
@@ -364,7 +372,7 @@ function bossBulletCollision() {
             // Deactivate the bullet
             bullet.active = false;
 
-            // Check if boss health has reached zero
+            // Check if boss health has reached zero, trigger the game won state
             if (bossHealth <= 0) {
                 gameState = gameWon;
             }
@@ -386,16 +394,7 @@ function keyPressed() {
         bullet.active = true;
         bullet.x = player.x + player.width / 2 - bullet.width / 2;
         bullet.y = player.y;
-        bullet.speed = 7; //positive speed for upward movement
-        player.cooldown = 15;
-    }
-
-    // Shoot bullet downwards
-    if (keyCode === DOWN_ARROW && !bullet.active && player.cooldown === 0) {
-        bullet.active = true;
-        bullet.x = player.x + player.width / 2 - bullet.width / 2;
-        bullet.y = player.y;
-        bullet.speed = -7; //negative speed for downward movement
+        bullet.speed = 7;
         player.cooldown = 15;
     }
 
@@ -418,28 +417,31 @@ function bossShoot() {
         });
     }
 
+    //reverse loop through the array?
     for (let i = bossBullets.length - 1; i >= 0; i--) {
         bossBullets[i].y += 7; // Move bullets downward
 
-        // Draw the boss bullet image
+        // Draw the boss bullet image based on random coordinates found in the array
         image(slipperImg, bossBullets[i].x, bossBullets[i].y,
             bossBullets[i].width, bossBullets[i].height);
 
-        // Check collision (adjust to use new bullet dimensions)
+        // Check collision between the bullet and the player, rectangular detection box, there was probably a better way.
         if (bossBullets[i].x > player.x &&
             bossBullets[i].x < player.x + player.width &&
             bossBullets[i].y > player.y &&
             bossBullets[i].y < player.y + player.height) {
+            //reduce the player's health
             playerHealth -= 10;
+            //remove from the array
             bossBullets.splice(i, 1);
 
-            // Check if player health has reached zero
+            // Check if player health has reached zero, and trigger game over if yes
             if (playerHealth <= 0) {
                 gameState = gameOver;
             }
-            continue;
+            continue; //skips the loop
         }
-
+        //remove if the bullet moves beyond the screen
         if (bossBullets[i].y > height) {
             bossBullets.splice(i, 1);
         }
@@ -447,13 +449,14 @@ function bossShoot() {
 }
 
 // Draw health bars for player and boss
+// checked a tutorial for help
 function drawHealthBars() {
     push();
     textFont('Courier New');
     textSize(14);
     textAlign(CENTER, TOP);
 
-    // Boss health bar
+    // Boss health bar, white rect within a black rect.
     stroke(0);
     strokeWeight(1);
     noFill();
@@ -463,11 +466,10 @@ function drawHealthBars() {
     rect(21, 21, 14, 118);
     fill(0);
     // Map boss health to bar height
-    //CLAUDE USED FOR LOGIC HELP!!
     rect(21, 21 + map(bossHealth, 100, 0, 0, 118), 14, map(bossHealth, 0, 100, 0, 118));
     text(bossHealth, 28, 145);
 
-    // Player health bar
+    // Player health bar, same thing
     stroke(0);
     strokeWeight(1);
     noFill();
@@ -484,41 +486,28 @@ function drawHealthBars() {
 function initializeGameOver() {
     let gameOverText = "Game Over!"; // Defined variable for game over text
 
-    // let gameOverSubtitle = "The clocks have taken over!"; // Defined variable for game over text
-
-
     textAlign(CENTER, CENTER);
     push();
 
-    // Display win
+    // Display loss
     fill('black');
     textStyle(BOLD);
     textSize(24);
-    //Shows specific reasoning for win/loss
     text(gameOverText, width / 2, height / 2 - 100);
     pop();
 
-    push();
-
-    // // Display win
-    // fill('black');
-    // textSize(15);
-    // //Shows specific reasoning for win/loss
-    // text(gameOverSubtitle, width / 2, height / 2 - 60);
-    // pop();
-
-    // Center the image
+    // image
     push();
     imageMode(CENTER);
-    image(angryMotherImg, width / 2, height / 2, 110, 100); // Adjust size as needed
+    image(angryMotherImg, width / 2, height / 2, 110, 100);
     pop();
 
+    push();
     // Button text
     fill('red');
     textStyle(BOLD);
     textSize(14);
     text('Press the __SPACEBAR__ to restart', width / 2, height / 2 + 100);
-
     pop();
 }
 
@@ -538,37 +527,37 @@ function resetGame() {
     player.x = 250;
     player.y = 440;
     player.cooldown = 0;
-    player.width = 150; // Reset player width
-    player.height = 150; // Reset player height
+    player.width = 150;
+    player.height = 150;
 
     // Reset bullet
     bullet.active = false;
-    bullet.width = 50; // Reset bullet width
-    bullet.height = 50; // Reset bullet height
+    bullet.width = 50;
+    bullet.height = 50;
 
-    // Recreate enemy grid
+    // Recreate both enemy grids
     enemies = [];
     for (let row = 0; row < enemyRows; row++) {
         for (let col = 0; col < enemyCols; col++) {
             enemies.push({
-                x: col * 80 + 100,
-                y: -60 - row * 60, // Start above the screen
-                width: 50, // Reset enemy width
-                height: 45, // Reset enemy height
+                x: col * 80 + 100, //left
+                y: -60 - row * 60,
+                width: 50,
+                height: 45,
                 alive: true,
-                speed: 0.4 // Add speed for vertical movement
+                speed: 0.4
             });
         }
     }
     for (let row = 0; row < enemyRows; row++) {
         for (let col = 0; col < enemyCols; col++) {
             enemies.push({
-                x: col * 80 + 400, // Adjusted x-coordinate calculation
-                y: -60 - row * 60, // Start above the screen
+                x: col * 80 + 400, //right
+                y: -60 - row * 60,
                 width: 50,
                 height: 45,
                 alive: true,
-                speed: 0.4 // Move downwards
+                speed: 0.4
             });
         }
     }
@@ -576,42 +565,33 @@ function resetGame() {
     // Remove any existing UI elements from previous game state
     removeElements();
     bossHealth = 100; // Reset boss health
-    playerHealth = 100;
+    playerHealth = 100; //reset player health
 }
 
 function initializeGameWon() {
-    let gameWonText = "Sleep mode: Eternal"; // Defined variable for game over text
+    let gameWonText = "Sleep mode: Eternal"; // Defined variable for game won text
 
-    let gameWonSubtitle = "Waking life is a myth"; // Defined variable for game over text
-
+    let gameWonSubtitle = "Waking life is a myth"; // Defined variable for subtitle
 
     textAlign(CENTER, CENTER);
-    push();
 
+    push();
     // Display win
     fill('black');
     textStyle(BOLD);
     textSize(24);
-    //Shows specific reasoning for win/loss
     text(gameWonText, width / 2, height / 2 - 110);
     pop();
 
-
-    // Display win
+    push();
+    // Display the subtitle under the title
     fill('black');
     textSize(14);
-    //Shows specific reasoning for win/loss
     text(gameWonSubtitle, width / 2, height / 2 - 80);
     pop();
-
-    // // Display win
-    // fill('black');
-    // textSize(15);
-    // //Shows specific reasoning for win/loss
-    // text(gameWonSubtitle, width / 2, height / 2 - 30);
-    // pop();
 
     push();
     imageMode(CENTER);
     image(sleepImg, width / 2, height / 2, 300, 100); // Adjust size as needed
+    pop();
 }
