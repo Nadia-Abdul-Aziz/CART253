@@ -4,6 +4,7 @@ let enemyImg;
 let bulletImg;
 let lossImg;
 let winImg;
+let bossImg;
 
 // Game states
 const titleScreen = 'title screen';
@@ -15,14 +16,16 @@ const gameWon = 'game won';
 let gameState = titleScreen;
 
 //setting other two states to false
-//I did this earlier but I can just remove this and change how they're called now that I have my title screen...but eh, I'm lazy.
 let gameOverInitialized = false;
 let gameWonInitialized = false;
 
+// Track number of game overs
+let gameOverCount = 0;
+
 //Angry guy
 let player = {
-    x: 320,
-    y: 430,
+    x: 250,
+    y: 440,
     width: 150,
     height: 150,
     speed: 5,
@@ -39,13 +42,23 @@ let bullet = {
     speed: 7
 };
 
+let boss = {
+    x: 320,
+    y: 0,
+    size: 180
+};
+
 // Array to store alarm clocks
 //Essentially just dissapears under the background overlay
 //Should this be an object?
 let enemies = [];
-const enemyRows = 3;     // Number of rows
-const enemyCols = 6;     // Number of columns
-let enemyDirection = 1;   // Direction of movement (1 for right, -1 for left)
+const enemyRows = 50;     // Essentially unlimited, until the boss dies
+const enemyCols = 2;     // Number of columns
+
+//combat variables
+let bossBullets = [];
+let playerHealth = 100;
+let bossHealth = 100;
 
 
 //Load all images
@@ -55,27 +68,35 @@ function preload() {
     bulletImg = loadImage('assets/images/pillow.png');
     lossImg = loadImage('assets/images/loss.jpg');
     winImg = loadImage('assets/images/z.png')
+    bossImg = loadImage('assets/images/mother.png')
 }
 
 
 function setup() {
     createCanvas(640, 480);
     imageMode(CENTER);
-    // Initialize enemies in a grid formation
-    // Could have also used a while loop
-    // Wouldn't run as its own function
-    // So I discovered the ++ thing, basically x + 1, one of the tutorials did this
-    // Outer loop iterates the rows and the inner one iterates through the columns
+    // Initialize enemies from the top
     for (let row = 0; row < enemyRows; row++) {
         for (let col = 0; col < enemyCols; col++) {
             enemies.push({
-                x: col * 80 + 100,
-                //spreading them horizontally, 80 pixels apart + offset of 100 from the edge
-                y: row * 60 + 50,
-                //vertical
+                x: col * 80 + 100, // Adjusted x-coordinate calculation
+                y: -60 - row * 60, // Start above the screen
                 width: 50,
                 height: 45,
-                alive: true //Initial state of not yet shot at
+                alive: true,
+                speed: 0.3 // Move downwards
+            });
+        }
+    }
+    for (let row = 0; row < enemyRows; row++) {
+        for (let col = 0; col < enemyCols; col++) {
+            enemies.push({
+                x: col * 80 + 400, // Adjusted x-coordinate calculation
+                y: -60 - row * 60, // Start above the screen
+                width: 50,
+                height: 45,
+                alive: true,
+                speed: 0.3 // Move downwards
             });
         }
     }
@@ -99,6 +120,7 @@ function draw() {
         case gameOver:
             // ! means only run if it isn't already running, same as === false
             if (!gameOverInitialized) {
+                gameOverCount++; // Increment loss counter
                 initializeGameOver();
                 gameOverInitialized = true;
             }
@@ -157,7 +179,7 @@ function drawTitleScreen() {
     textStyle(NORMAL);
     textSize(14);
     text('1. Use LEFT and RIGHT arrow keys move!', width / 2, height * 0.6);
-    text('2. Press the SPACEBAR to yeet pillows at your alarms!', width / 2, height * 0.65);
+    text('2. Press the UP and DOWN arrow keys to shoot!', width / 2, height * 0.65);
     text('3. Smash all clocks before they catch up to you!', width / 2, height * 0.7);
 
     fill('red');
@@ -178,19 +200,23 @@ function updateGame() {
     //only draw if the state is playing, fixing bug to only draw during playing state issue
     if (gameState === gamePlaying) {
 
-        drawPlayer();
+        drawPlayerBoss();
 
         movePlayer();
 
         shootBullet();
 
         updateEnemy();
+
+        bossShoot();
+
+        bossBulletCollision();
     }
 
 };
 
 //Draws the image for the player
-function drawPlayer() {
+function drawPlayerBoss() {
     push();
 
     // Translate the player image to follow input
@@ -200,6 +226,20 @@ function drawPlayer() {
     image(playerImg, 0, -70, player.width, player.height);
 
     pop();
+
+    // Draw Bugzilla
+    push();
+    translate(boss.x, boss.y);
+    imageMode(CENTER);
+    image(bossImg, 0, 30, boss.size, boss.size);
+    pop();
+
+    // Draw boss bullets
+    bossBullets.forEach(bullet => {
+        ellipse(bullet.x, bullet.y, 8, 8);
+    });
+
+    drawHealthBars();
 };
 
 //Handles keyboard input to move the angry man
@@ -229,7 +269,7 @@ function shootBullet() {
         bullet.y -= bullet.speed;  // Move bullet upwards
 
         // Deactivate pillow if it goes off screen
-        if (bullet.y < 0) {
+        if (bullet.y < 0 || bullet.y > height) {
             bullet.active = false;
         }
     }
@@ -239,7 +279,6 @@ function shootBullet() {
 function updateEnemy() {
 
     //variables
-    let moveDown = false;
     let enemiesAlive = false;
 
     // Check if enemies need to change direction
@@ -247,24 +286,15 @@ function updateEnemy() {
     enemies.forEach(enemy => {
         if (enemy.alive) {
             enemiesAlive = true;
-            // Check if enemies have hit canvas bounds
-            if ((enemy.x + enemy.width > width && enemyDirection > 0) ||
-                (enemy.x < 0 && enemyDirection < 0)) {
-                //if yes, then move, see next part
-                moveDown = true;
-            }
+            //Removed enemy direction change code
         }
     });
 
     //Update enemy positions and check for collisions
     enemies.forEach(enemy => {
         if (enemy.alive) {
-            // Move enemies down if they hit screen edge
-            if (moveDown) {
-                enemy.y += 20;
-            }
-            // Move enemies horizontally
-            enemy.x += enemyDirection * 2;
+            // Move enemies vertically
+            enemy.y += enemy.speed; // Move enemies downwards
 
             // Draw the actual clock
             image(enemyImg, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2,
@@ -277,16 +307,12 @@ function updateEnemy() {
             }
 
             // Check if enemies have reached the player's line
-            if (enemy.y + enemy.height > player.y) {
+            if (enemy.y < player.y && enemy.speed < 0 || enemy.y > player.y && enemy.speed > 0) {
                 gameState = gameOver;
             }
         }
     });
 
-    // Change enemy direction if they hit screen edges
-    if (moveDown) {
-        enemyDirection *= -1;
-    }
 
     // Check if all enemies are defeated, trigger win screen
     if (!enemiesAlive) {
@@ -303,6 +329,30 @@ function collision(bullet, enemy) {
         bullet.y + bullet.height > enemy.y;
 }
 
+function bossBulletCollision() {
+    // Check if bullet is active
+    if (bullet.active) {
+        // Calculate boss boundaries accounting for centered image
+        let bossLeft = boss.x - boss.size / 2;
+        let bossRight = boss.x + boss.size / 2;
+        let bossTop = boss.y - boss.size / 2;
+        let bossBottom = boss.y + boss.size / 2;
+
+        // Check for collision between bullet and boss
+        if (bullet.x < bossRight &&
+            bullet.x + bullet.width > bossLeft &&
+            bullet.y < bossBottom &&
+            bullet.y + bullet.height > bossTop) {
+
+            // Reduce boss health
+            bossHealth -= 10;
+
+            // Deactivate the bullet
+            bullet.active = false;
+        }
+    }
+}
+
 // Handles user input
 function keyPressed() {
 
@@ -312,15 +362,21 @@ function keyPressed() {
         return;
     }
 
-    // Create a new bullet when spacebar is pressed
-    // When the player shoots the cooldown begins at 15 and decreases
-    //makes sure there isn't already a bullet on screen, no double fire.
-    if (keyCode === 32 && !bullet.active && player.cooldown === 0) { // Space bar key
+    // Shoot bullet upwards
+    if (keyCode === UP_ARROW && !bullet.active && player.cooldown === 0) {
         bullet.active = true;
-        // Calculating the location of the player
         bullet.x = player.x + player.width / 2 - bullet.width / 2;
         bullet.y = player.y;
-        // Set cooldown between shots
+        bullet.speed = 7; //positive speed for upward movement
+        player.cooldown = 15;
+    }
+
+    // Shoot bullet downwards
+    if (keyCode === DOWN_ARROW && !bullet.active && player.cooldown === 0) {
+        bullet.active = true;
+        bullet.x = player.x + player.width / 2 - bullet.width / 2;
+        bullet.y = player.y;
+        bullet.speed = -7; //negative speed for downward movement
         player.cooldown = 15;
     }
 
@@ -328,6 +384,68 @@ function keyPressed() {
     if (keyCode === 32 && gameState === gameOver) {
         resetGame();
     }
+}
+
+
+function bossShoot() {
+    if (random() < 0.03) { //likelihood to shoot
+        // Randomly generate boss bullets within boss's width
+        let bulletX = random(boss.x - boss.size / 6, boss.x + boss.size / 6);
+        bossBullets.push({ x: bulletX, y: boss.y + boss.size / 4 });
+    }
+
+    for (let i = bossBullets.length - 1; i >= 0; i--) {
+        bossBullets[i].y += 7; // Move bullets downward
+
+        // Check collision
+        if (bossBullets[i].x > player.x &&
+            bossBullets[i].x < player.x + player.width &&
+            bossBullets[i].y > player.y &&
+            bossBullets[i].y < player.y + player.height) {
+            playerHealth -= 10;
+            bossBullets.splice(i, 1);
+            continue;
+        }
+
+        if (bossBullets[i].y > height) {
+            bossBullets.splice(i, 1);
+        }
+    }
+}
+
+// Draw health bars for player and boss
+function drawHealthBars() {
+    push();
+    textFont('Courier New');
+    textSize(14);
+    textAlign(CENTER, TOP);
+
+    // Boss health bar
+    stroke(0);
+    strokeWeight(1);
+    noFill();
+    rect(20, 20, 16, 120);
+    fill(255);
+    noStroke();
+    rect(21, 21, 14, 118);
+    fill(0);
+    // Map boss health to bar height
+    //CLAUDE USED FOR LOGIC HELP!!
+    rect(21, 21 + map(bossHealth, 100, 0, 0, 118), 14, map(bossHealth, 0, 100, 0, 118));
+    text(bossHealth, 28, 145);
+
+    // Player health bar
+    stroke(0);
+    strokeWeight(1);
+    noFill();
+    rect(width - 36, height - 140, 16, 120);
+    fill(255);
+    noStroke();
+    rect(width - 35, height - 139, 14, 118);
+    fill(0);
+    rect(width - 35, height - 139 + map(playerHealth, 100, 0, 0, 118), 14, map(playerHealth, 0, 100, 0, 118));
+    text(playerHealth, width - 28, height - 160);
+    pop();
 }
 
 function initializeGameOver() {
@@ -384,8 +502,8 @@ function resetGame() {
     gameWonInitialized = false;
 
     // Reset player position and cooldown
-    player.x = 320;
-    player.y = 430;
+    player.x = 250;
+    player.y = 440;
     player.cooldown = 0;
     player.width = 150; // Reset player width
     player.height = 150; // Reset player height
@@ -401,19 +519,30 @@ function resetGame() {
         for (let col = 0; col < enemyCols; col++) {
             enemies.push({
                 x: col * 80 + 100,
-                y: row * 60 + 50,
+                y: -60 - row * 60, // Start above the screen
                 width: 50, // Reset enemy width
                 height: 45, // Reset enemy height
-                alive: true
+                alive: true,
+                speed: 0.2 // Add speed for vertical movement
+            });
+        }
+    }
+    for (let row = 0; row < enemyRows; row++) {
+        for (let col = 0; col < enemyCols; col++) {
+            enemies.push({
+                x: col * 80 + 400, // Adjusted x-coordinate calculation
+                y: -60 - row * 60, // Start above the screen
+                width: 50,
+                height: 45,
+                alive: true,
+                speed: 0.2 // Move downwards
             });
         }
     }
 
-    // Reset enemy movement direction
-    enemyDirection = 1;
-
     // Remove any existing UI elements from previous game state
     removeElements();
+    bossHealth = 100; // Reset boss health
 }
 
 function initializeGameWon() {

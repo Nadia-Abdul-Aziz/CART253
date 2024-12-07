@@ -20,6 +20,10 @@ Getting the damn buttons onto the canvas: https://www.youtube.com/watch?v=7_jNZL
 
 Collisions: https://www.youtube.com/watch?v=HK_oG_ev8FQ
 
+Health bars: https://www.youtube.com/watch?v=d21jNGfeNOU
+
+
+
 
 
 
