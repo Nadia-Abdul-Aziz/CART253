@@ -5,7 +5,9 @@ let bulletImg;
 let lossImg;
 let winImg;
 let bossImg;
-
+let slipperImg;
+let angryMotherImg;
+let sleepImg;
 // Game states
 const titleScreen = 'title screen';
 const gamePlaying = 'playing';
@@ -69,6 +71,9 @@ function preload() {
     lossImg = loadImage('assets/images/loss.jpg');
     winImg = loadImage('assets/images/z.png')
     bossImg = loadImage('assets/images/mother.png')
+    slipperImg = loadImage('assets/images/slipper.png')
+    angryMotherImg = loadImage('assets/images/angryMother.png')
+    sleepImg = loadImage('assets/images/sleep.png')
 }
 
 
@@ -84,7 +89,7 @@ function setup() {
                 width: 50,
                 height: 45,
                 alive: true,
-                speed: 0.3 // Move downwards
+                speed: 0.5 // Move downwards
             });
         }
     }
@@ -96,7 +101,7 @@ function setup() {
                 width: 50,
                 height: 45,
                 alive: true,
-                speed: 0.3 // Move downwards
+                speed: 0.5 // Move downwards
             });
         }
     }
@@ -166,10 +171,18 @@ function drawTitleScreen() {
     fill('black');
     textSize(48);
     textStyle(BOLD);
-    text('CLOCK ATTACK', width / 2, height * 0.15);
+    text('THE MOTHER', width / 2, height * 0.15);
+
+    push();
+    // Title
+    fill('red');
+    textSize(14);
+    textStyle(BOLD);
+    text('The Final Boss', width / 2, height * 0.22);
+    pop();
 
     imageMode(CENTER);
-    image(enemyImg, width / 2, height * 0.32, 70, 60); // Adjust size as needed
+    image(bossImg, width / 2, height * 0.35, 70, 60); // Adjust size as needed
 
     // Game rules
     textSize(18);
@@ -178,9 +191,10 @@ function drawTitleScreen() {
 
     textStyle(NORMAL);
     textSize(14);
-    text('1. Use LEFT and RIGHT arrow keys move!', width / 2, height * 0.6);
-    text('2. Press the UP and DOWN arrow keys to shoot!', width / 2, height * 0.65);
-    text('3. Smash all clocks before they catch up to you!', width / 2, height * 0.7);
+    text('1. Use LEFT and RIGHT arrow keys to evade her dreaded slipper!', width / 2, height * 0.6);
+    text('2. Press the UP key to fight back!', width / 2, height * 0.65);
+    text("3. Resist so hard, your mom thinks it's still the weekend!", width / 2, height * 0.7);
+    text("4. Don't forget those godforsaken alarms!", width / 2, height * 0.75);
 
     fill('red');
     textStyle(BOLD);
@@ -349,6 +363,11 @@ function bossBulletCollision() {
 
             // Deactivate the bullet
             bullet.active = false;
+
+            // Check if boss health has reached zero
+            if (bossHealth <= 0) {
+                gameState = gameWon;
+            }
         }
     }
 }
@@ -388,22 +407,36 @@ function keyPressed() {
 
 
 function bossShoot() {
-    if (random() < 0.03) { //likelihood to shoot
+    if (random() < 0.02) { //likelihood to shoot
         // Randomly generate boss bullets within boss's width
         let bulletX = random(boss.x - boss.size / 6, boss.x + boss.size / 6);
-        bossBullets.push({ x: bulletX, y: boss.y + boss.size / 4 });
+        bossBullets.push({
+            x: bulletX,
+            y: boss.y + boss.size / 4,
+            width: 50,  // Add width and height for the image
+            height: 30
+        });
     }
 
     for (let i = bossBullets.length - 1; i >= 0; i--) {
         bossBullets[i].y += 7; // Move bullets downward
 
-        // Check collision
+        // Draw the boss bullet image
+        image(slipperImg, bossBullets[i].x, bossBullets[i].y,
+            bossBullets[i].width, bossBullets[i].height);
+
+        // Check collision (adjust to use new bullet dimensions)
         if (bossBullets[i].x > player.x &&
             bossBullets[i].x < player.x + player.width &&
             bossBullets[i].y > player.y &&
             bossBullets[i].y < player.y + player.height) {
             playerHealth -= 10;
             bossBullets.splice(i, 1);
+
+            // Check if player health has reached zero
+            if (playerHealth <= 0) {
+                gameState = gameOver;
+            }
             continue;
         }
 
@@ -477,14 +510,14 @@ function initializeGameOver() {
     // Center the image
     push();
     imageMode(CENTER);
-    image(lossImg, width / 2, height / 2, 200, 150); // Adjust size as needed
+    image(angryMotherImg, width / 2, height / 2, 110, 100); // Adjust size as needed
     pop();
 
     // Button text
     fill('red');
     textStyle(BOLD);
     textSize(14);
-    text('Press the __SPACEBAR__ to Restart', width / 2, height / 2 + 100);
+    text('Press the __SPACEBAR__ to restart', width / 2, height / 2 + 100);
 
     pop();
 }
@@ -523,7 +556,7 @@ function resetGame() {
                 width: 50, // Reset enemy width
                 height: 45, // Reset enemy height
                 alive: true,
-                speed: 0.2 // Add speed for vertical movement
+                speed: 0.4 // Add speed for vertical movement
             });
         }
     }
@@ -535,7 +568,7 @@ function resetGame() {
                 width: 50,
                 height: 45,
                 alive: true,
-                speed: 0.2 // Move downwards
+                speed: 0.4 // Move downwards
             });
         }
     }
@@ -543,12 +576,13 @@ function resetGame() {
     // Remove any existing UI elements from previous game state
     removeElements();
     bossHealth = 100; // Reset boss health
+    playerHealth = 100;
 }
 
 function initializeGameWon() {
-    let gameWonText = "You Win!"; // Defined variable for game over text
+    let gameWonText = "Sleep mode: Eternal"; // Defined variable for game over text
 
-    // let gameWonSubtitle = "You defeated the clocks!"; // Defined variable for game over text
+    let gameWonSubtitle = "Waking life is a myth"; // Defined variable for game over text
 
 
     textAlign(CENTER, CENTER);
@@ -559,10 +593,16 @@ function initializeGameWon() {
     textStyle(BOLD);
     textSize(24);
     //Shows specific reasoning for win/loss
-    text(gameWonText, width / 2, height / 2 - 90);
+    text(gameWonText, width / 2, height / 2 - 110);
     pop();
 
-    push();
+
+    // Display win
+    fill('black');
+    textSize(14);
+    //Shows specific reasoning for win/loss
+    text(gameWonSubtitle, width / 2, height / 2 - 80);
+    pop();
 
     // // Display win
     // fill('black');
@@ -573,5 +613,5 @@ function initializeGameWon() {
 
     push();
     imageMode(CENTER);
-    image(winImg, width / 2, height / 2, 200, 100); // Adjust size as needed
+    image(sleepImg, width / 2, height / 2, 300, 100); // Adjust size as needed
 }

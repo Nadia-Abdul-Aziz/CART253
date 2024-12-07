@@ -147,7 +147,7 @@ function drawTitleScreen() {
     text('CLOCK ATTACK', width / 2, height * 0.15);
 
     imageMode(CENTER);
-    image(enemyImg, width / 2, height * 0.32, 70, 60); // Adjust size as needed
+    image(enemyImg, width / 2, height * 0.32, 7, 70); // Adjust size as needed
 
     // Game rules
     textSize(18);
@@ -156,9 +156,9 @@ function drawTitleScreen() {
 
     textStyle(NORMAL);
     textSize(14);
-    text('1. Use LEFT and RIGHT arrow keys move!', width / 2, height * 0.6);
-    text('2. Press the SPACEBAR to yeet pillows at your alarms!', width / 2, height * 0.65);
-    text('3. Smash all clocks before they catch up to you!', width / 2, height * 0.7);
+    text('1. Use LEFT and RIGHT arrow keys to march against the slumber destroyers!', width / 2, height * 0.6);
+    text('2. Press the UP key to yeet pillows at your alarms!', width / 2, height * 0.65);
+    text('3. Obliterate all clocks before they turn you into a functional adult', width / 2, height * 0.7);
 
     fill('red');
     textStyle(BOLD);
@@ -315,7 +315,7 @@ function keyPressed() {
     // Create a new bullet when spacebar is pressed
     // When the player shoots the cooldown begins at 15 and decreases
     //makes sure there isn't already a bullet on screen, no double fire.
-    if (keyCode === 32 && !bullet.active && player.cooldown === 0) { // Space bar key
+    if (keyCode === (UP_ARROW) && !bullet.active && player.cooldown === 0) { // Space bar key
         bullet.active = true;
         // Calculating the location of the player
         bullet.x = player.x + player.width / 2 - bullet.width / 2;
@@ -444,5 +444,5 @@ function initializeGameWon() {
 
     push();
     imageMode(CENTER);
-    image(winImg, width / 2, height / 2, 200, 100); // Adjust size as needed
+    image(winImg, width / 2, height / 2, 100, 50); // Adjust size as needed
 }

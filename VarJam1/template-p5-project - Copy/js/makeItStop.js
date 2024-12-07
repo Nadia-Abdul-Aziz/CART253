@@ -170,12 +170,12 @@ function drawTitleScreen() {
     push();
     // Title
     fill('black');
-    textSize(48);
+    textSize(40);
     textStyle(BOLD);
-    text('CLOCK ATTACK', width / 2, height * 0.15);
+    text('PLEASE!! MAKE IT STOP!!!', width / 2, height * 0.15);
 
     imageMode(CENTER);
-    image(enemyImg, width / 2, height * 0.32, 70, 60); // Adjust size as needed
+    image(bulletImg, width / 2, height * 0.32, 90, 80); // Adjust size as needed
 
     // Game rules
     textSize(18);
@@ -184,9 +184,9 @@ function drawTitleScreen() {
 
     textStyle(NORMAL);
     textSize(14);
-    text('1. Use LEFT and RIGHT arrow keys move!', width / 2, height * 0.6);
-    text('2. Press the UP and DOWN arrow keys to shoot!', width / 2, height * 0.65);
-    text('3. Smash all clocks before they catch up to you!', width / 2, height * 0.7);
+    text('1. Use LEFT and RIGHT arrow keys to defend your spot in the warmth of your blanket!', width / 2, height * 0.6);
+    text('2. Press the UP and DOWN arrow keys to silence the tyrants...well, if you can!', width / 2, height * 0.65);
+    text('3. Want 5 more minutes? Vanquish your endless alarms...', width / 2, height * 0.7);
 
     fill('red');
     textStyle(BOLD);
@@ -205,14 +205,10 @@ function updateGame() {
 
     //only draw if the state is playing, fixing bug to only draw during playing state issue
     if (gameState === gamePlaying) {
-
-        drawPlayer();
-
-        movePlayer();
-
-        shootBullet();
-
         updateEnemy();
+        drawPlayer();
+        movePlayer();
+        shootBullet();
     }
 
 };
@@ -295,7 +291,7 @@ function updateEnemy() {
             }
 
             // Check if enemies have reached the player's line
-            if (enemy.y < player.y && enemy.speed < 0 || enemy.y > player.y && enemy.speed > 0) {
+            if (enemy.y < player.y + player.height / 2 - 40 && enemy.speed < 0 || enemy.y > player.y - player.height / 2 + 40 && enemy.speed > 0) {
                 gameState = gameOver;
             }
         }
@@ -478,7 +474,7 @@ function initializeGameWon() {
 
     push();
     imageMode(CENTER);
-    image(winImg, width / 2, height / 2, 200, 100); // Adjust size as needed
+    image(winImg, width / 2, height / 2, 100, 50); // Adjust size as needed
 }
 
 function initializeGameOverThreeTimes() {
@@ -509,7 +505,7 @@ function initializeGameOverThreeTimes() {
     // Center the image
     push();
     imageMode(CENTER);
-    image(defeatImg, width / 2, height / 2 + 15, 200, 100); // Adjust size as needed
+    image(defeatImg, width / 2, height / 2 + 15, 150, 75); // Adjust size as needed
     pop();
 
 }

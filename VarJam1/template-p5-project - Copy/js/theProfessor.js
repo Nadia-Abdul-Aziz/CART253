@@ -5,6 +5,7 @@ let bulletImg;
 let lossImg;
 let winImg;
 let professorImg;
+let angryProfessorImg;
 
 // Game states
 const titleScreen = 'title screen';
@@ -35,10 +36,10 @@ let player = {
 //The follower
 let professor = {
     x: 50,
-    y: 460,
-    width: 50,
-    height: 50,
-    speed: 2,
+    y: 450,
+    width: 65,
+    height: 65,
+    speed: 2, // Reduced professor speed
     active: false   // Initially doesn't move
 };
 
@@ -69,6 +70,7 @@ function preload() {
     lossImg = loadImage('assets/images/loss.jpg');
     winImg = loadImage('assets/images/z.png')
     professorImg = loadImage('assets/images/professor.png');
+    angryProfessorImg = loadImage('assets/images/angryProfessor.png');
 }
 
 
@@ -158,10 +160,10 @@ function drawTitleScreen() {
     fill('black');
     textSize(48);
     textStyle(BOLD);
-    text('CLOCK ATTACK', width / 2, height * 0.15);
+    text('THE PROFESSOR', width / 2, height * 0.15);
 
     imageMode(CENTER);
-    image(enemyImg, width / 2, height * 0.32, 70, 60); // Adjust size as needed
+    image(professorImg, width / 2, height * 0.32, 70, 60); // Adjust size as needed
 
     // Game rules
     textSize(18);
@@ -170,9 +172,10 @@ function drawTitleScreen() {
 
     textStyle(NORMAL);
     textSize(14);
-    text('1. Use LEFT and RIGHT arrow keys move!', width / 2, height * 0.6);
-    text('2. Press the SPACEBAR to yeet pillows at your alarms!', width / 2, height * 0.65);
-    text('3. Smash all clocks before they catch up to you!', width / 2, height * 0.7);
+    text("1. Use LEFT and RIGHT arrow keys to run because you've got places...not to be.", width / 2, height * 0.6);
+    text('2. Press the UP key to chuck pillows!', width / 2, height * 0.65);
+    text('3. Snub your alarms to skip that dreaded 8am class!', width / 2, height * 0.7);
+    text('4. Now run away from your professor you coward...pressing the SPACEBAR to jump might help.', width / 2, height * 0.75);
 
     fill('red');
     textStyle(BOLD);
@@ -217,17 +220,11 @@ function movePlayer() {
     if (keyIsDown(RIGHT_ARROW) && player.x < width - player.width) {
         player.x += player.speed;
     }
-
-    // Jump only when on ground
-    if (keyIsDown(UP_ARROW) && player.isOnGround) {
-        player.ySpeed = -11; // Negative value makes the player jump up
-        player.isOnGround = false;
-    }
 }
 
 function updatePlayer() {
     // Apply gravity
-    player.ySpeed += 0.5; // Adjust this value to control gravity strength
+    player.ySpeed += 0.4; // Adjust this value to control gravity strength
     player.y += player.ySpeed;
 
     // Ground collision
@@ -289,7 +286,7 @@ function updateEnemy() {
                 enemy.y += 20;
             }
             // Move enemies horizontally
-            enemy.x += enemyDirection * 2;
+            enemy.x += enemyDirection * 1; // Reduced enemy speed
 
             // Draw the actual clock
             image(enemyImg, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2,
@@ -337,17 +334,19 @@ function keyPressed() {
         return;
     }
 
-    // Create a new bullet when spacebar is pressed
-    // When the player shoots the cooldown begins at 15 and decreases
-    //makes sure there isn't already a bullet on screen, no double fire.
-    if (keyCode === 32 && !bullet.active && player.cooldown === 0) { // Space bar key
+    if (keyCode === UP_ARROW && !bullet.active && player.cooldown === 0) {
         bullet.active = true;
         // Calculating the location of the player
         bullet.x = player.x + player.width / 2 - bullet.width / 2;
         bullet.y = player.y;
         // Set cooldown between shots
-        //reduced because it was too long
         player.cooldown = 15;
+    }
+
+    // Jump when SPACEBAR is pressed
+    if (keyCode === 32 && player.isOnGround) {
+        player.ySpeed = -11; // Negative value makes the player jump up
+        player.isOnGround = false;
     }
 
     // Restart game when spacebar is pressed during game over state
@@ -392,7 +391,7 @@ function checkProfessorCollision() {
         return false; // Player is above professor, no collision
     }
 
-    let padding = 20; // Consistent padding
+    let padding = 30; // Consistent padding
 
     //Slight issue with assymetry on the right side when colliding, 
     return (
@@ -402,7 +401,7 @@ function checkProfessorCollision() {
         //if the player's x location left + the player's width minus padding
         //
         player.x + padding < professor.x + professor.width - padding &&
-        player.x + player.width - padding > professor.x + padding &&
+        player.x + player.width > professor.x &&
         player.y + padding < professor.y + professor.height - padding &&
         player.y + player.height - padding > professor.y + padding
     );
@@ -437,7 +436,7 @@ function initializeGameOver() {
     // Center the image
     push();
     imageMode(CENTER);
-    image(lossImg, width / 2, height / 2, 200, 150); // Adjust size as needed
+    image(angryProfessorImg, width / 2, height / 2, 100, 90); // Adjust size as needed
     pop();
 
     // Button text
@@ -475,7 +474,7 @@ function resetGame() {
 
     //reset professor
     professor.x = 50;
-    professor.y = 460;
+    professor.y = 450;
     professor.active = false
 
     // Recreate enemy grid
@@ -527,5 +526,5 @@ function initializeGameWon() {
 
     push();
     imageMode(CENTER);
-    image(winImg, width / 2, height / 2, 200, 100); // Adjust size as needed
+    image(winImg, width / 2, height / 2, 100, 50); // Adjust size as needed
 }
